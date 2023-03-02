@@ -1,7 +1,6 @@
 import os
 from PySide2 import QtWidgets
 import hou
-from importlib import reload
 
 proj = hou.getenv('JOB') + '/'
 
