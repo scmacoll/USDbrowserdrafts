@@ -9,7 +9,6 @@ class ProjectManager(QtWidgets.QWidget):
     def __init__(self):
         super(ProjectManager, self).__init__()
 
-
     def open_scene(self, item):
         print('open hip file')
         hip_file = proj + item.data()
