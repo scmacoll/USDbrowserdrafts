@@ -16,7 +16,6 @@ class ProjectManager(QtWidgets.QWidget):
         # open hip_file
         hou.hipFile.load(hip_file)
 
-
     def create_interface(self):
         widget = QtWidgets.QLabel(proj)
         list_widget = QtWidgets.QListWidget()
