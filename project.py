@@ -6,8 +6,9 @@ proj = hou.getenv('JOB') + '/'
 
 
 class ProjectManager(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self):  # constructor
         super(ProjectManager, self).__init__()
+        self.create_interface()
 
     def open_scene(self, item):
         print('open hip file')
@@ -17,6 +18,7 @@ class ProjectManager(QtWidgets.QWidget):
         hou.hipFile.load(hip_file)
 
     def create_interface(self):
+        print("creating interface")
         widget = QtWidgets.QLabel(proj)
         list_widget = QtWidgets.QListWidget()
 
