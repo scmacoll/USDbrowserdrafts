@@ -19,7 +19,8 @@ class ProjectManager(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
         # Add widgets to layout
-        main_layout.addWidget(self.widget)
+        main_layout.addWidget(self.label)
+        main_layout.addWidget(self.list_widget)
 
 
     def open_scene(self, item):
