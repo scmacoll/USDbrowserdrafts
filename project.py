@@ -25,7 +25,7 @@ class ProjectManager(QtWidgets.QWidget):
         # self.label = QtWidgets.QLabel(self.proj)  # label files
         # self.list_widget = QtWidgets.QListWidget()  # create list widget
 
-        # create connections
+        # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
 
         # self.create_interface()
