@@ -30,7 +30,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="setproj">
        <property name="sizeIncrement">
         <size>
          <width>0</width>
@@ -60,7 +60,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="projpath">
        <property name="text">
         <string>/obj/sops/houdini</string>
        </property>
@@ -70,7 +70,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="projname">
        <property name="font">
         <font>
          <pointsize>20</pointsize>
@@ -85,7 +85,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidget">
+      <widget class="QListWidget" name="scenelist">
        <item>
         <property name="text">
          <string>scene 1</string>
