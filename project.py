@@ -16,7 +16,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         # get UI elements (designer)
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
-        self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
+        self.proj_path = self.ui.findChild(QtWidgets.QLineEdit, 'projpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
 
@@ -48,9 +48,9 @@ class ProjectManager(QtWidgets.QWidget):
         hou.hscript('setenv JOB=' + set_job)
         self.proj = hou.getenv('JOB') + '/'
 
-        proj_name = set_job.split('/')[-2]
+        proj_name = 'Project:  ' + set_job.split('/')[-2]
         set_job = os.path.dirname(set_job)  # remove "/" @ end of name
-        proj_path = os.path.split(set_job)[0]  # remove project name
+        proj_path = set_job
 
         self.proj_name.setText(proj_name)
         self.proj_path.setText(proj_path + '/')
@@ -63,13 +63,15 @@ class ProjectManager(QtWidgets.QWidget):
                 self.proj, selected_item.text())):
             self.proj = os.path.join(self.proj, selected_item.text())
             self.create_interface()
+            self.proj_path.setText(os.path.normpath(self.proj))
 
     # def create_interface(self):
     #     print("loaded interface")
     #     self.scene_list.clear()
     #
     #     for file in os.listdir(self.proj):
-    #         if not '.' in file:
+    #         path = os.path.join(self.proj, file)
+    #         if os.path.isdir(path):
     #             self.scene_list.addItem(file)
     #             self.scene_list.doubleClicked.connect(self.navigate_subdir)
     #         elif file.endswith('.usda'):
@@ -78,12 +80,14 @@ class ProjectManager(QtWidgets.QWidget):
     #                 lambda item: print("importing usda"))
     #
     #     return self.scene_list
-
     def create_interface(self):
         print("loaded interface")
         self.scene_list.clear()
 
-        for file in os.listdir(self.proj):
+        items = os.listdir(self.proj)
+        items.sort()
+
+        for file in items:
             path = os.path.join(self.proj, file)
             if os.path.isdir(path):
                 self.scene_list.addItem(file)
@@ -94,3 +98,4 @@ class ProjectManager(QtWidgets.QWidget):
                     lambda item: print("importing usda"))
 
         return self.scene_list
+
