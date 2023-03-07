@@ -72,7 +72,6 @@ class ProjectManager(QtWidgets.QWidget):
         for file in os.listdir(self.proj):
             if not '.' in file:
                 self.scene_list.addItem(file)
-
-        self.scene_list.doubleClicked.connect(self.navigate_subdir)
+                self.scene_list.doubleClicked.connect(self.navigate_subdir)
 
         return self.scene_list
