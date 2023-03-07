@@ -49,36 +49,48 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj = hou.getenv('JOB') + '/'
 
         proj_name = set_job.split('/')[-2]
-        set_job = os.path.dirname(set_job)  # removes "/" @ end of name
-        proj_path = os.path.split(set_job)[0]  # removes project name
+        set_job = os.path.dirname(set_job)  # remove "/" @ end of name
+        proj_path = os.path.split(set_job)[0]  # remove project name
 
         self.proj_name.setText(proj_name)
         self.proj_path.setText(proj_path + '/')
 
         self.create_interface()
 
-# create function to navigate down all levels of the selected subdirectories
     def navigate_subdir(self):
-        self.scene_list.clear()
-        for file in os.listdir(self.proj + self.scene_list.currentItem().text()):
-            if not '.' in file:
-                self.scene_list.addItem(file)
-                self.scene_list.doubleClicked.connect(self.navigate_subdir)
+        selected_item = self.scene_list.currentItem()
+        if selected_item is not None and os.path.isdir(os.path.join(
+                self.proj, selected_item.text())):
+            self.proj = os.path.join(self.proj, selected_item.text())
+            self.create_interface()
 
-    # def open_scene(self, item):
-    #     print('open hip file')
+    # def create_interface(self):
+    #     print("loaded interface")
     #     self.scene_list.clear()
-    #     hip_file = self.proj + item.data()
-    #     hip_file.current().text()
-    #     hou.hipFile.load(hip_file)
+    #
+    #     for file in os.listdir(self.proj):
+    #         if not '.' in file:
+    #             self.scene_list.addItem(file)
+    #             self.scene_list.doubleClicked.connect(self.navigate_subdir)
+    #         elif file.endswith('.usda'):
+    #             self.scene_list.addItem(file)
+    #             self.scene_list.doubleClicked.connect(
+    #                 lambda item: print("importing usda"))
+    #
+    #     return self.scene_list
 
     def create_interface(self):
-        print("creating interface")
+        print("loaded interface")
         self.scene_list.clear()
 
         for file in os.listdir(self.proj):
-            if not '.' in file:
+            path = os.path.join(self.proj, file)
+            if os.path.isdir(path):
                 self.scene_list.addItem(file)
                 self.scene_list.doubleClicked.connect(self.navigate_subdir)
+            elif file.endswith('.usda'):
+                self.scene_list.addItem(file)
+                self.scene_list.doubleClicked.connect(
+                    lambda item: print("importing usda"))
 
         return self.scene_list
