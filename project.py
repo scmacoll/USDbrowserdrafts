@@ -57,10 +57,18 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.create_interface()
 
-    def open_scene(self, item):
-        print('open hip     file')
-        hip_file = self.proj + item.data()
-        hou.hipFile.load(hip_file)
+
+# create function to open subdirectory of selected file in list
+    def navigate_subdir(self):
+        print("navigating subdirectory")
+        selected_item = self.scene_list.currentItem().text()
+        self.scene_list.clear()
+
+        for file in os.listdir(self.proj + selected_item):
+            if not '.' in file:
+                self.scene_list.addItem(file)
+                self.scene_list.doubleClicked.connect(self.navigate_subdir)
+
 
     def create_interface(self):
         print("creating interface")
@@ -69,7 +77,7 @@ class ProjectManager(QtWidgets.QWidget):
         for file in os.listdir(self.proj):
             if not '.' in file:
                 self.scene_list.addItem(file)
+                self.scene_list.doubleClicked.connect(self.navigate_subdir)
 
-        self.scene_list.doubleClicked.connect(self.open_scene)
 
         return self.scene_list
