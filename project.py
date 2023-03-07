@@ -65,6 +65,13 @@ class ProjectManager(QtWidgets.QWidget):
                 self.scene_list.addItem(file)
                 self.scene_list.doubleClicked.connect(self.navigate_subdir)
 
+    # def open_scene(self, item):
+    #     print('open hip file')
+    #     self.scene_list.clear()
+    #     hip_file = self.proj + item.data()
+    #     hip_file.current().text()
+    #     hou.hipFile.load(hip_file)
+
     def create_interface(self):
         print("creating interface")
         self.scene_list.clear()
