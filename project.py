@@ -57,22 +57,19 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.create_interface()
 
-    def open_scene(self, item):  # double click to open hip file
+    def open_scene(self, item):
         print('open hip     file')
         hip_file = self.proj + item.data()
-        # print hip_file
-        # open hip_file
         hou.hipFile.load(hip_file)
 
-    def create_interface(self):  # create list interface
+    def create_interface(self):
         print("creating interface")
         self.scene_list.clear()
 
         for file in os.listdir(self.proj):
-            if not file.endswith('.html') and not file.endswith('.txt'):
+            if not '.' in file:
                 self.scene_list.addItem(file)
 
-        # connect list items to function
         self.scene_list.doubleClicked.connect(self.open_scene)
 
         return self.scene_list
