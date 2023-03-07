@@ -28,6 +28,7 @@
           <option value="object.addItem" />
           <option value="object.doubleClicked" />
           <option value="object.clear" />
+          <option value="object.currentItem" />
         </list>
       </option>
     </inspection_tool>

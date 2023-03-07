@@ -57,18 +57,13 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.create_interface()
 
-
-# create function to open subdirectory of selected file in list
+# create function to navigate down all levels of the selected subdirectories
     def navigate_subdir(self):
-        print("navigating subdirectory")
-        selected_item = self.scene_list.currentItem().text()
         self.scene_list.clear()
-
-        for file in os.listdir(self.proj + selected_item):
+        for file in os.listdir(self.proj + self.scene_list.currentItem().text()):
             if not '.' in file:
                 self.scene_list.addItem(file)
                 self.scene_list.doubleClicked.connect(self.navigate_subdir)
-
 
     def create_interface(self):
         print("creating interface")
@@ -78,6 +73,5 @@ class ProjectManager(QtWidgets.QWidget):
             if not '.' in file:
                 self.scene_list.addItem(file)
                 self.scene_list.doubleClicked.connect(self.navigate_subdir)
-
 
         return self.scene_list
