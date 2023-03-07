@@ -23,6 +23,9 @@
           <option value="hou.ui.*" />
           <option value="hou.fileType.*" />
           <option value="object.setText" />
+          <option value="object.addItem" />
+          <option value="object.doubleClicked" />
+          <option value="object.clear" />
         </list>
       </option>
     </inspection_tool>

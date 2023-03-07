@@ -4,7 +4,7 @@ from PySide2 import QtWidgets, QtUiTools
 
 
 class ProjectManager(QtWidgets.QWidget):
-    def __init__(self):  # constructor
+    def __init__(self):  # constructor`
         super(ProjectManager, self).__init__()
 
         self.proj = hou.getenv('JOB') + '/'
@@ -18,6 +18,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
         self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
+        self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
 
         # # Create widgets
         # self.btn = QtWidgets.QPushButton('Click me')
@@ -27,8 +28,6 @@ class ProjectManager(QtWidgets.QWidget):
 
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
-
-        # self.create_interface()
 
         # Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
@@ -56,9 +55,10 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj_name.setText(proj_name)
         self.proj_path.setText(proj_path + '/')
 
+        self.create_interface()
 
     def open_scene(self, item):  # double click to open hip file
-        print('open hip file')
+        print('open hip     file')
         hip_file = self.proj + item.data()
         # print hip_file
         # open hip_file
@@ -66,11 +66,13 @@ class ProjectManager(QtWidgets.QWidget):
 
     def create_interface(self):  # create list interface
         print("creating interface")
+        self.scene_list.clear()
 
         for file in os.listdir(self.proj):
-            self.list_widget.addItem(file)
+            if not file.endswith('.html') and not file.endswith('.txt'):
+                self.scene_list.addItem(file)
 
         # connect list items to function
-        self.list_widget.doubleClicked.connect(self.open_scene)
+        self.scene_list.doubleClicked.connect(self.open_scene)
 
-        return self.list_widget
+        return self.scene_list
