@@ -16,7 +16,8 @@ class ProjectManager(QtWidgets.QWidget):
 
         # get UI elements (designer)
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
-        self.proj_path = self.ui.findChild(QtWidgets.QLineEdit, 'projpath')
+        self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
+        self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
 
@@ -49,11 +50,13 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj = hou.getenv('JOB') + '/'
 
         proj_name = 'Project:  ' + set_job.split('/')[-2]
-        set_job = os.path.dirname(set_job)  # remove "/" @ end of name
-        proj_path = set_job
+        set_job = 'JOB:  ' + os.path.dirname(set_job)
+        proj_path = 'Path:  ' + os.path.split(set_job)[1]
+        job_path = set_job
 
         self.proj_name.setText(proj_name)
         self.proj_path.setText(proj_path + '/')
+        self.job_path.setText(job_path + '/')
 
         self.create_interface()
 
@@ -63,7 +66,10 @@ class ProjectManager(QtWidgets.QWidget):
                 self.proj, selected_item.text())):
             self.proj = os.path.join(self.proj, selected_item.text())
             self.create_interface()
-            self.proj_path.setText(os.path.normpath(self.proj))
+            rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
+            self.proj_path.setText(os.path.normpath(self.proj_path.text())
+                                   + '/' + rel_path + '/')
+            print(self.proj_path.text())
 
     # def create_interface(self):
     #     print("loaded interface")

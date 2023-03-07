@@ -15,26 +15,11 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="projname">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>No Project Selected</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="4" column="0">
+     <item row="6" column="0">
       <widget class="QListWidget" name="scenelist"/>
      </item>
-     <item row="5" column="0">
+     <item row="7" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QPushButton" name="pushButton_2">
@@ -52,15 +37,23 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="0">
+     <item row="5" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
      </item>
      <item row="1" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLineEdit" name="projpath">
+       <item alignment="Qt::AlignLeft">
+        <widget class="QLabel" name="projname">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
          <property name="text">
-          <string/>
+          <string>Select a Project</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -97,10 +90,24 @@
        </item>
       </layout>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
+      <widget class="QLabel" name="projpath">
+       <property name="text">
+        <string>Path :  no project selected</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
       <widget class="QCommandLinkButton" name="commandLinkButton">
        <property name="text">
         <string>CommandLinkButton</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="jobpath">
+       <property name="text">
+        <string>Job:    no project selected</string>
        </property>
       </widget>
      </item>

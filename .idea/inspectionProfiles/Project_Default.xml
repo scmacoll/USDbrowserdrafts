@@ -29,6 +29,8 @@
           <option value="object.doubleClicked" />
           <option value="object.clear" />
           <option value="object.currentItem" />
+          <option value="object.text" />
+          <option value="object.__add__" />
         </list>
       </option>
     </inspection_tool>
