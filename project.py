@@ -16,11 +16,11 @@ class ProjectManager(QtWidgets.QWidget):
 
         # get UI elements (designer)
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
+        self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
         self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
-        self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
 
         icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                     '/back.svg'
@@ -67,19 +67,22 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.create_interface()
 
+        # back button functionality to go to parent directory of current
+        # directory and stop at JOBS folder
     def back_button(self):
-        # get parent directory
-        parent_dir = os.path.dirname(self.proj[:-1])  # [:-1] removes the
-        # trailing slash
+        # if self.proj != hou.getenv('JOB'):
+        #     self.back_btn.setEnabled(True)
+        #     print(self.proj)
+        #     print(hou.getenv('JOB'))
+        # else:
+        #     self.back_btn.setEnabled(False)
+        print(self.proj)
 
-        # set new project path and update UI
-        if os.path.isdir(parent_dir):
-            self.proj = parent_dir + '/'
+        print(self.job_path.text())
+        self.proj = os.path.dirname(self.proj)
+        self.create_interface()
 
-            self.create_interface()
-            rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
-            self.proj_path.setText(os.path.normpath(self.proj_path.text())
-                                   + '/' + rel_path + '/')
+
 
     def navigate_subdir(self):
         selected_item = self.scene_list.currentItem()
@@ -88,6 +91,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.proj = os.path.join(self.proj, selected_item.text())
 
             self.create_interface()
+            # clear project path
             rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
             self.proj_path.setText(os.path.normpath(self.proj_path.text())
                                    + '/' + rel_path + '/')

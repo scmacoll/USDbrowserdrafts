@@ -31,6 +31,8 @@
           <option value="object.currentItem" />
           <option value="object.text" />
           <option value="object.__add__" />
+          <option value="object.setEnabled" />
+          <option value="project.on_up_button_pressed.clicked" />
         </list>
       </option>
     </inspection_tool>
