@@ -1,6 +1,6 @@
 import os
 import hou
-from PySide2 import QtWidgets, QtUiTools
+from PySide2 import QtWidgets, QtUiTools, QtGui
 
 
 class ProjectManager(QtWidgets.QWidget):
@@ -20,6 +20,12 @@ class ProjectManager(QtWidgets.QWidget):
         self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
+        self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
+
+        icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
+                    '/back.svg'
+        icon = QtGui.QIcon(icon_path)
+        self.back_btn.setIcon(icon)
 
         # # Create widgets
         # self.btn = QtWidgets.QPushButton('Click me')
@@ -29,6 +35,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
+        self.back_btn.clicked.connect(self.back_button)
 
         # Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
@@ -60,16 +67,30 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.create_interface()
 
+    def back_button(self):
+        # get parent directory
+        parent_dir = os.path.dirname(self.proj[:-1])  # [:-1] removes the
+        # trailing slash
+
+        # set new project path and update UI
+        if os.path.isdir(parent_dir):
+            self.proj = parent_dir + '/'
+
+            self.create_interface()
+            rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
+            self.proj_path.setText(os.path.normpath(self.proj_path.text())
+                                   + '/' + rel_path + '/')
+
     def navigate_subdir(self):
         selected_item = self.scene_list.currentItem()
         if selected_item is not None and os.path.isdir(os.path.join(
                 self.proj, selected_item.text())):
             self.proj = os.path.join(self.proj, selected_item.text())
+
             self.create_interface()
             rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
             self.proj_path.setText(os.path.normpath(self.proj_path.text())
                                    + '/' + rel_path + '/')
-            print(self.proj_path.text())
 
     # def create_interface(self):
     #     print("loaded interface")

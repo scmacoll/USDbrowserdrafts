@@ -17,7 +17,11 @@
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="6" column="0">
-      <widget class="QListWidget" name="scenelist"/>
+      <widget class="QListWidget" name="scenelist">
+       <property name="viewMode">
+        <enum>QListView::ListMode</enum>
+       </property>
+      </widget>
      </item>
      <item row="7" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -37,8 +41,27 @@
        </item>
       </layout>
      </item>
-     <item row="5" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+     <item row="2" column="0">
+      <widget class="QLabel" name="jobpath">
+       <property name="text">
+        <string>Job:    no project selected</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QCommandLinkButton" name="backbtn">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../../../../../../../Documents/3D/QtDesigner/icons/BUTTONS/back.svg</normaloff>../../../../../../../Documents/3D/QtDesigner/icons/BUTTONS/back.svg</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item row="1" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -93,28 +116,19 @@
      <item row="3" column="0">
       <widget class="QLabel" name="projpath">
        <property name="text">
-        <string>Path :  no project selected</string>
+        <string>Path :  /</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QCommandLinkButton" name="commandLinkButton">
-       <property name="text">
-        <string>CommandLinkButton</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="jobpath">
-       <property name="text">
-        <string>Job:    no project selected</string>
-       </property>
-      </widget>
+     <item row="5" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
