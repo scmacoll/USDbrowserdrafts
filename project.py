@@ -4,7 +4,7 @@ from PySide2 import QtWidgets, QtUiTools, QtGui
 
 
 class ProjectManager(QtWidgets.QWidget):
-    def __init__(self):  # constructor`
+    def __init__(self):
         super(ProjectManager, self).__init__()
 
         self.proj = hou.getenv('JOB') + '/'
@@ -27,12 +27,6 @@ class ProjectManager(QtWidgets.QWidget):
         icon = QtGui.QIcon(icon_path)
         self.back_btn.setIcon(icon)
 
-        # # Create widgets
-        # self.btn = QtWidgets.QPushButton('Click me')
-        # self.lbl_title = QtWidgets.QLabel("PROJECT MANAGER")  # label Title
-        # self.label = QtWidgets.QLabel(self.proj)  # label files
-        # self.list_widget = QtWidgets.QListWidget()  # create list widget
-
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
@@ -41,12 +35,6 @@ class ProjectManager(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
         main_layout.addWidget(self.ui)
-
-        # # Add widgets to layout
-        # main_layout.addWidget(self.lbl_title)  # label (title) outside list
-        # main_layout.addWidget(self.label)  # label outside list
-        # main_layout.addWidget(self.list_widget)  # visible list
-        # main_layout.addWidget(self.btn)
 
         self.setLayout(main_layout)
 
@@ -67,22 +55,16 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.create_interface()
 
-        # back button functionality to go to parent directory of current
-        # directory and stop at JOBS folder
     def back_button(self):
-
-        print(os.path.abspath(self.proj) + '/')
-        print(self.job_path.text().split('JOB:  ')[1])
-
         home_dir = os.path.expanduser("~")
-        job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME', home_dir)
+        job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME',
+                                                                   home_dir)
 
         if os.path.abspath(self.proj) + '/' == job_path:
             return
         else:
             self.proj = os.path.dirname(self.proj)
             self.create_interface()
-
 
     def navigate_subdir(self):
         selected_item = self.scene_list.currentItem()
@@ -96,21 +78,6 @@ class ProjectManager(QtWidgets.QWidget):
             self.proj_path.setText(os.path.normpath(self.proj_path.text())
                                    + '/' + rel_path + '/')
 
-    # def create_interface(self):
-    #     print("loaded interface")
-    #     self.scene_list.clear()
-    #
-    #     for file in os.listdir(self.proj):
-    #         path = os.path.join(self.proj, file)
-    #         if os.path.isdir(path):
-    #             self.scene_list.addItem(file)
-    #             self.scene_list.doubleClicked.connect(self.navigate_subdir)
-    #         elif file.endswith('.usda'):
-    #             self.scene_list.addItem(file)
-    #             self.scene_list.doubleClicked.connect(
-    #                 lambda item: print("importing usda"))
-    #
-    #     return self.scene_list
     def create_interface(self):
         print("loaded interface")
         self.scene_list.clear()
