@@ -70,18 +70,18 @@ class ProjectManager(QtWidgets.QWidget):
         # back button functionality to go to parent directory of current
         # directory and stop at JOBS folder
     def back_button(self):
-        # if self.proj != hou.getenv('JOB'):
-        #     self.back_btn.setEnabled(True)
-        #     print(self.proj)
-        #     print(hou.getenv('JOB'))
-        # else:
-        #     self.back_btn.setEnabled(False)
-        print(self.proj)
 
-        print(self.job_path.text())
-        self.proj = os.path.dirname(self.proj)
-        self.create_interface()
+        print(os.path.abspath(self.proj) + '/')
+        print(self.job_path.text().split('JOB:  ')[1])
 
+        home_dir = os.path.expanduser("~")
+        job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME', home_dir)
+
+        if os.path.abspath(self.proj) + '/' == job_path:
+            return
+        else:
+            self.proj = os.path.dirname(self.proj)
+            self.create_interface()
 
 
     def navigate_subdir(self):
