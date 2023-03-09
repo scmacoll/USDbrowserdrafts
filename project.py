@@ -77,6 +77,8 @@ class ProjectManager(QtWidgets.QWidget):
             rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
             self.proj_path.setText(os.path.normpath(self.proj_path.text())
                                    + '/' + rel_path + '/')
+            print(self.proj_path.text())
+            print(rel_path)
 
     def create_interface(self):
         print("loaded interface")
