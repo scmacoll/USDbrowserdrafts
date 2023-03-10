@@ -93,14 +93,7 @@ class ProjectManager(QtWidgets.QWidget):
             if self.current_index > -1:
                 self.current_index -= 1
                 self.proj = self.visited_dirs[self.current_index + 1]
-                # print(self.visited_dirs[self.current_index])
                 self.create_interface()
-
-                # print("BEFORE:  " + self.proj)
-                # self.proj = os.path.dirname(self.proj) + '/'
-                # print("AFTER:  " + self.proj)
-
-                # self.proj assigned to parent of current directory
 
                 # removing the last directory from the path
                 if hasattr(self, 'first_path'):
