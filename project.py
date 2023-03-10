@@ -67,29 +67,30 @@ class ProjectManager(QtWidgets.QWidget):
         self.create_interface()
 
     def back_button(self):
-
-
         home_dir = os.path.expanduser("~")
         job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME',
                                                                    home_dir)
-        if self.proj[-2:] == '//':
-            self.proj = self.proj[:-1]
-            if os.path.abspath(self.proj) + '/' == job_path:
-                print("Can't go back any further on the $JOB PATH")
-                return
-            else:
-                if self.current_index > -1:
-                    self.current_index -= 1
+        # if self.proj[-2:] == '//':
+        #     self.proj = self.proj[:-1]
+        if os.path.abspath(self.proj) + '/' == job_path:
+            print("Can't go back any further on the $JOB PATH")
+            return
+        else:
+            if self.current_index > -1:
+                print(self.current_index)
+                self.current_index -= 1
 
-                # print("BEFORE:  " + self.proj)
-                # self.proj = os.path.dirname(self.proj) + '/'
-                # print("AFTER:  " + self.proj)
+            # print("BEFORE:  " + self.proj)
+            # self.proj = os.path.dirname(self.proj) + '/'
+            # print("AFTER:  " + self.proj)
 
-                self.proj = self.visited_dirs[self.current_index - 1]
-                print(self.proj + ' = ' + str(self.current_index))
+            self.proj = self.visited_dirs[self.current_index - 1]
+            # self.proj assigned to parent of current directory
 
+            print(self.proj + ' = ' + str(self.current_index))
 
-                self.create_interface()
+            self.create_interface()
+
         # removing the last directory from the path
         if hasattr(self, 'first_path'):
             proj_path = self.proj_path.text()
@@ -201,8 +202,8 @@ class ProjectManager(QtWidgets.QWidget):
                 self.scene_list.doubleClicked.connect(self.navigate_subdir)
             elif file.endswith('.usda'):
                 self.scene_list.addItem(file)
-                self.scene_list.doubleClicked.connect(
-                    lambda item: print("importing usda"))
+                # self.scene_list.doubleClicked.connect(
+                #     lambda item: print("importing usda"))
 
         return self.scene_list
 
