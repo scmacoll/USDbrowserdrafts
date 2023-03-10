@@ -41,7 +41,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
 
-
         # Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
@@ -64,7 +63,22 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj_path.setText(proj_path + '/')
         self.job_path.setText(job_path + '/')
 
+        # if self.current_index == len(self.visited_dirs) - 1:
+        #     self.visited_dirs.append(self.proj)
+        # else:
+        #     self.visited_dirs = self.visited_dirs[:self.current_index + 1]
+        #     self.visited_dirs.append(self.proj)
+
+        if self.proj in self.visited_dirs:
+            index = self.visited_dirs.index(self.proj)
+            self.visited_dirs[index] = self.proj
+            self.current_index = index
+        else:
+            self.current_index = len(self.visited_dirs)
+            self.visited_dirs.append(self.proj)
+
         self.create_interface()
+
 
     def back_button(self):
         home_dir = os.path.expanduser("~")
@@ -77,31 +91,30 @@ class ProjectManager(QtWidgets.QWidget):
             return
         else:
             if self.current_index > -1:
-                print(self.current_index)
                 self.current_index -= 1
+                self.proj = self.visited_dirs[self.current_index + 1]
+                # print(self.visited_dirs[self.current_index])
+                self.create_interface()
 
-            # print("BEFORE:  " + self.proj)
-            # self.proj = os.path.dirname(self.proj) + '/'
-            # print("AFTER:  " + self.proj)
+                # print("BEFORE:  " + self.proj)
+                # self.proj = os.path.dirname(self.proj) + '/'
+                # print("AFTER:  " + self.proj)
 
-            self.proj = self.visited_dirs[self.current_index - 1]
-            # self.proj assigned to parent of current directory
+                # self.proj assigned to parent of current directory
 
-            print(self.proj + ' = ' + str(self.current_index))
+                # removing the last directory from the path
+                if hasattr(self, 'first_path'):
+                    proj_path = self.proj_path.text()
+                    first_path_len = len(self.first_path)
+                    if len(proj_path) > first_path_len:
+                        # Find the second last occurrence of the path
+                        # separator '/'
+                        index = proj_path[:-1].rfind('/') + 1
+                        self.proj_path.setText(
+                            os.path.normpath(proj_path[:index]) + '/')
 
-            self.create_interface()
-
-        # removing the last directory from the path
-        if hasattr(self, 'first_path'):
-            proj_path = self.proj_path.text()
-            first_path_len = len(self.first_path)
-            if len(proj_path) > first_path_len:
-                # Find the second last occurrence of the path separator '/'
-                index = proj_path[:-1].rfind('/') + 1
-                self.proj_path.setText(os.path.normpath(proj_path[:index]) +
-                                       '/')
-        # print('back- ' + self.proj_path.text() + ' = ' + str(
-        #     self.current_index))
+            else:
+                print("Can't go back any further")
 
     def forward_button(self):
         if self.proj[-2:] == '//':
@@ -110,14 +123,13 @@ class ProjectManager(QtWidgets.QWidget):
         highlight_item = self.scene_list.currentItem()
 
         # if index is not at the end of the list
-        if self.current_index < len(self.visited_dirs) \
+        if self.current_index < len(self.visited_dirs) - 1 \
                 and highlight_item is None:
             self.current_index += 1
 
             self.proj = self.visited_dirs[self.current_index]
-            print(self.proj + ' = ' + str(self.current_index))
             self.create_interface()
-            # print(self.proj)
+
             # * project path label
             rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
             if not hasattr(self, 'first_path'):
@@ -148,7 +160,7 @@ class ProjectManager(QtWidgets.QWidget):
                 self.current_index = self.visited_dirs.index(self.proj)
 
             self.proj = os.path.join(self.proj, highlight_item.text()) + '/'
-            print(self.proj + ' = ' + str(self.current_index))
+            # print(self.proj + ' = ' + str(self.current_index))
             self.create_interface()
             # * project path label
             rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
@@ -173,7 +185,7 @@ class ProjectManager(QtWidgets.QWidget):
                 self.current_index = self.visited_dirs.index(self.proj)
 
             self.proj = os.path.join(self.proj, selected_item.text()) + '/'
-            print(self.proj + ' = ' + str(self.current_index))
+            # print(self.proj + ' = ' + str(self.current_index))
             # print(self.proj)
             self.create_interface()
             # * project path label
@@ -189,7 +201,13 @@ class ProjectManager(QtWidgets.QWidget):
         if self.proj[-2:] == '//':
             self.proj = self.proj[:-1]
         # print("loaded interface")
-        print(self.proj + ' = ' + str(self.current_index))
+
+        print(self.proj + ' = '
+              + 'Index: '
+              + str(self.current_index)
+              + ' Length: '
+              + str(len(self.visited_dirs)))
+
         self.scene_list.clear()
 
         items = os.listdir(self.proj)
@@ -206,4 +224,3 @@ class ProjectManager(QtWidgets.QWidget):
                 #     lambda item: print("importing usda"))
 
         return self.scene_list
-
