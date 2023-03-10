@@ -8,6 +8,10 @@ class ProjectManager(QtWidgets.QWidget):
         super(ProjectManager, self).__init__()
 
         self.proj = hou.getenv('JOB') + '/'
+        self.visited_dirs = []
+        self.current_index = -1
+        print(str((self.proj.split('/')[6] + '/ = ' + (str(
+            self.current_index)))))
 
         # Load UI file
         loader = QtUiTools.QUiLoader()
@@ -69,7 +73,11 @@ class ProjectManager(QtWidgets.QWidget):
         if os.path.abspath(self.proj) + '/' == job_path:
             return
         else:
-            self.prev_proj = self.proj
+            if self.current_index > -1:
+                self.current_index -= 1
+
+            # self.prev_proj = self.proj
+
             self.proj = os.path.dirname(self.proj)
             self.create_interface()
         # removing the last directory from the path
@@ -81,54 +89,86 @@ class ProjectManager(QtWidgets.QWidget):
                 index = proj_path[:-1].rfind('/') + 1
                 self.proj_path.setText(os.path.normpath(proj_path[:index]) +
                                        '/')
-
-
+        print('back- ' + self.proj_path.text() + ' = ' + str(
+            self.current_index))
 
     def forward_button(self):
         highlight_item = self.scene_list.currentItem()
 
-        if hasattr(self, 'prev_proj') and highlight_item is None:
-            self.proj = self.prev_proj
-            print(self.prev_proj)
+        # if index is not at the end of the list
+        if self.current_index < len(self.visited_dirs) \
+                and highlight_item is None:
+            self.current_index += 1
+
             print(self.proj)
+            print('fwd- ' + self.proj_path.text() + ' = ' + str(
+                self.current_index))
+            self.proj = self.visited_dirs[self.current_index]
             self.create_interface()
 
-            del self.prev_proj
-
+            # * project path label
             rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
             if not hasattr(self, 'first_path'):
                 self.first_path = os.path.join(self.proj_path.text(), '')
             self.proj_path.setText(os.path.normpath(self.first_path +
                                                     rel_path) + '/')
+
+        # elif hasattr(self, 'prev_proj') and highlight_item is None:
+        #     self.proj = self.prev_proj
+        #     self.create_interface()
+        #
+        #     del self.prev_proj
+        #     # * project path label
+        #     rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
+        #     if not hasattr(self, 'first_path'):
+        #         self.first_path = os.path.join(self.proj_path.text(), '')
+        #     self.proj_path.setText(os.path.normpath(self.first_path +
+        #                                             rel_path) + '/')
+
         elif highlight_item is not None and os.path.isdir(os.path.join(
                 self.proj, highlight_item.text())):
+
+            if self.proj not in self.visited_dirs:
+                self.visited_dirs.append(self.proj)
+                self.current_index += 1
+            else:
+                self.current_index = self.visited_dirs.index(self.proj)
+
             self.proj = os.path.join(self.proj, highlight_item.text())
-
             self.create_interface()
-
-        rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
-        if not hasattr(self, 'first_path'):
-            self.first_path = os.path.join(self.proj_path.text(), '')
-        self.proj_path.setText(os.path.normpath(self.first_path +
-                                                rel_path) + '/')
-
+            # * project path label
+            rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
+            if not hasattr(self, 'first_path'):
+                self.first_path = os.path.join(self.proj_path.text(), '')
+            self.proj_path.setText(os.path.normpath(self.first_path +
+                                                    rel_path) + '/')
 
     def navigate_subdir(self):
         selected_item = self.scene_list.currentItem()
-        if selected_item is not None and os.path.isdir(os.path.join(
-                self.proj, selected_item.text())):
+
+        if selected_item is not None and os.path.isdir(
+                os.path.join(self.proj, selected_item.text())):
+
+            if self.proj not in self.visited_dirs:
+                self.visited_dirs.append(self.proj)
+                self.current_index += 1
+            else:
+                self.current_index = self.visited_dirs.index(self.proj)
+
             self.proj = os.path.join(self.proj, selected_item.text())
-
+            print(len(self.visited_dirs))
             self.create_interface()
-
+            # * project path label
             rel_path = os.path.relpath(self.proj, start=hou.getenv('JOB'))
             if not hasattr(self, 'first_path'):
                 self.first_path = os.path.join(self.proj_path.text(), '')
             self.proj_path.setText(os.path.normpath(self.first_path +
                                                     rel_path) + '/')
+        # print('nav- ' + self.proj_path.text() + ' = ' + str(
+        #     self.current_index))
 
     def create_interface(self):
-        print("loaded interface")
+        # print("loaded interface")
         self.scene_list.clear()
 
         items = os.listdir(self.proj)
