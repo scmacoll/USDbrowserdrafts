@@ -115,6 +115,11 @@ class ProjectManager(QtWidgets.QWidget):
 
     def update_scene_list(self):
         self.scene_list.clear()
+
+        self.tree.root.path = self.tree.root.path + '/'
+        if self.tree.root.path[-2:] == '//':
+            self.tree.root.path = self.tree.root.path[:-1]
+
         print("current node:    " + str(self.tree.root))
         print("node path:    " + self.tree.root.path)
         print("node children []:    " + str(self.tree.root.children))
@@ -134,12 +139,15 @@ class ProjectManager(QtWidgets.QWidget):
         return self.scene_list
 
     def back_button(self):
-        self.current_node = self.current_node.parent
+
+
         self.update_scene_list()
 
     def forward_button(self):
         selected_item = self.scene_list.currentItem()
-        if selected_item is not None:
+
+        if selected_item is not None and os.path.isdir(os.path.join(
+                self.tree.root.path, selected_item.text())):
             selected_path = os.path.join(self.current_node.path,
                                          selected_item.text())
             for child in self.current_node.children:
@@ -147,11 +155,14 @@ class ProjectManager(QtWidgets.QWidget):
                     self.current_node = child
                     self.update_scene_list()
                     break
+        else:
+            print("you have selected a .USD file")
+            return
 
         self.tree.root.path = os.path.join(
             self.tree.root.path + selected_item.text())
 
-        print("forward button pressed with no errors! :D")
+        print("<<<    forward button pressed! :D    >>>")
         self.update_scene_list()
 
     def get_current_node(self):
