@@ -163,6 +163,7 @@ class ProjectManager(QtWidgets.QWidget):
                 self.current_node.path, selected_item.text())):
             selected_path = os.path.join(self.current_node.path,
                                          selected_item.text())
+            self.back_stack.clear()
             for child in self.current_node.children:
                 if child.path == selected_path:
                     self.current_node = child
