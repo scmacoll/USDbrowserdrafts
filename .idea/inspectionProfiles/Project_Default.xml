@@ -49,6 +49,7 @@
           <option value="object.setIcon" />
           <option value="str.text" />
           <option value="object.sortItems" />
+          <option value="project.Node.subdirs_present" />
         </list>
       </option>
     </inspection_tool>

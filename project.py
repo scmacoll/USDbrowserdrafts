@@ -52,6 +52,8 @@ class ProjectManager(QtWidgets.QWidget):
         self.current_node = self.tree.root
         print("    REFRESH    ")
 
+        self.back_stack = []
+
         # Load UI file
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load('/Users/stu/Library/Preferences/houdini/19.5'
@@ -79,6 +81,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
+        self.fwd_btn.clicked.connect(self.redo_click_forward)
         self.scene_list.doubleClicked.connect(self.double_click_forward)
 
 
@@ -112,6 +115,7 @@ class ProjectManager(QtWidgets.QWidget):
 
     def update_scene_list(self):
         self.scene_list.clear()
+        self.current_node.subdirs_present = False
 
         self.current_node.path = self.current_node.path + '/'
         if self.current_node.path[-2:] == '//':
@@ -130,6 +134,7 @@ class ProjectManager(QtWidgets.QWidget):
                 self.scene_list.addItem(file)
                 self.tree.add_path(path + '/')  # sequential paths added
                 self.tree.node = self.current_node
+                self.current_node.subdirs_present = True
             elif file.endswith('.usda'):
                 self.scene_list.addItem(file)
 
@@ -145,6 +150,7 @@ class ProjectManager(QtWidgets.QWidget):
             print("Can't go back any further on the $JOB PATH")
             return
         else:
+            self.back_stack.append(self.current_node.path)
             self.current_node.path = os.path.dirname(
                 os.path.dirname(self.current_node.path))
             print("going back to:    " + self.current_node.path)
@@ -178,6 +184,23 @@ class ProjectManager(QtWidgets.QWidget):
     def double_click_forward(self):
         self.forward_button()
 
+    def redo_click_forward(self):
+        selected_item = self.scene_list.currentItem()
+        print("<<<    redo click forward button pressed! :D    >>>")
+        print("stack length:    " + str(len(self.back_stack)))
 
-    def get_current_node(self):
-        return self.current_node
+        if selected_item is None:
+            if len(self.back_stack) >= 1 and self.current_node.subdirs_present:
+                node = self.back_stack.pop()
+                self.current_node.path = node
+                self.update_scene_list()
+                print("stack length:    " + str(len(self.back_stack)))
+            elif len(self.back_stack) <= 0 and \
+                    self.current_node.subdirs_present:
+                print("    No more redos!    ")
+                return
+            else:
+                print("    Can't go back any further!    ")
+                return
+
+
