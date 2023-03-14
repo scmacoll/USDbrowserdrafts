@@ -12,10 +12,6 @@ class Node:
         print("Adding child:", node.path)
         self.children.append(node)
 
-    #  !TO DO
-    # def parent(self, parent):
-    #     self.parent = os.normpath.isdir(self.parent)
-
 
 class Tree:
     def __init__(self, root=""):
@@ -83,6 +79,8 @@ class ProjectManager(QtWidgets.QWidget):
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
+        self.scene_list.doubleClicked.connect(self.double_click_forward)
+
 
         # Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
@@ -95,10 +93,9 @@ class ProjectManager(QtWidgets.QWidget):
         set_job = hou.ui.selectFile(title='Select Project Folder',
                                     file_type=hou.fileType.Directory)
         hou.hscript('setenv JOB=' + set_job)
-        # set_job = os.path.expanduser(set_job)
         self.proj = hou.getenv('JOB')
 
-        self.tree = Tree(self.proj)  # create a new tree
+        self.tree = Tree(self.proj)
         self.current_node = self.tree.root  # create a new node
         self.tree.add_path(self.proj)  # add path to tree node
 
@@ -116,38 +113,48 @@ class ProjectManager(QtWidgets.QWidget):
     def update_scene_list(self):
         self.scene_list.clear()
 
-        self.tree.root.path = self.tree.root.path + '/'
-        if self.tree.root.path[-2:] == '//':
-            self.tree.root.path = self.tree.root.path[:-1]
+        self.current_node.path = self.current_node.path + '/'
+        if self.current_node.path[-2:] == '//':
+            self.current_node.path = self.current_node.path[:-1]
 
-        print("current node:    " + str(self.tree.root))
-        print("node path:    " + self.tree.root.path)
-        print("node children []:    " + str(self.tree.root.children))
+        print("current node:    " + str(self.current_node))
+        print("node path:    " + self.current_node.path)
+        print("node children []:    " + str(self.current_node.children))
 
-        items = os.listdir(self.tree.root.path)
+        items = os.listdir(self.current_node.path)
         items.sort()
 
         for file in items:
-            path = os.path.join(self.tree.root.path, file)
+            path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
                 self.scene_list.addItem(file)
                 self.tree.add_path(path + '/')  # sequential paths added
-                self.tree.node = self.tree.root
+                self.tree.node = self.current_node
             elif file.endswith('.usda'):
                 self.scene_list.addItem(file)
 
         return self.scene_list
 
     def back_button(self):
+        print("<<<    back button pressed! :D    >>>")
+        home_dir = os.path.expanduser("~")
+        job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME',
+                                                                   home_dir)
 
-
-        self.update_scene_list()
+        if os.path.abspath(self.current_node.path) == job_path:
+            print("Can't go back any further on the $JOB PATH")
+            return
+        else:
+            self.current_node.path = os.path.dirname(
+                os.path.dirname(self.current_node.path))
+            print("going back to:    " + self.current_node.path)
+            self.update_scene_list()
 
     def forward_button(self):
         selected_item = self.scene_list.currentItem()
 
         if selected_item is not None and os.path.isdir(os.path.join(
-                self.tree.root.path, selected_item.text())):
+                self.current_node.path, selected_item.text())):
             selected_path = os.path.join(self.current_node.path,
                                          selected_item.text())
             for child in self.current_node.children:
@@ -155,15 +162,22 @@ class ProjectManager(QtWidgets.QWidget):
                     self.current_node = child
                     self.update_scene_list()
                     break
-        else:
+        elif selected_item is not None and selected_item.text().endswith(
+                '.usda'):
             print("you have selected a .USD file")
             return
+        else:
+            return
 
-        self.tree.root.path = os.path.join(
-            self.tree.root.path + selected_item.text())
+        self.current_node.path = os.path.join(
+            self.current_node.path + selected_item.text())
 
         print("<<<    forward button pressed! :D    >>>")
         self.update_scene_list()
+
+    def double_click_forward(self):
+        self.forward_button()
+
 
     def get_current_node(self):
         return self.current_node
