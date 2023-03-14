@@ -1,6 +1,6 @@
 import os
 import hou
-from PySide2 import QtWidgets, QtUiTools, QtGui
+from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
 
 class Node:
@@ -33,7 +33,6 @@ class Tree:
                 found = Node(part)
                 current.add_child(found)
             current = found
-
 
     def get_current_path(self, current):
         path = []
@@ -84,13 +83,23 @@ class ProjectManager(QtWidgets.QWidget):
         self.fwd_btn.clicked.connect(self.redo_click_forward)
         self.scene_list.doubleClicked.connect(self.double_click_forward)
 
-
         # Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
         main_layout.addWidget(self.ui)
 
         self.setLayout(main_layout)
+
+        # override mousePressEvent for scene_list widget (to clear selection
+        # on left click) (see below)
+        self.scene_list.mousePressEvent = self.mousePressEvent
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:  # left click
+            item = self.scene_list.itemAt(event.pos())  # get item at click
+            if not item:  # if no item at click
+                self.scene_list.clearSelection()  # clear selection
+            super(ProjectManager, self).mousePressEvent(event)
 
     def set_project(self):
         set_job = hou.ui.selectFile(title='Select Project Folder',
