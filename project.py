@@ -203,5 +203,3 @@ class ProjectManager(QtWidgets.QWidget):
             else:
                 print("    Can't go back any further!    ")
                 return
-
-
