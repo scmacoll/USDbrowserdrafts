@@ -1,4 +1,7 @@
 import os
+
+from PySide2.QtCore import Qt
+
 import hou
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
@@ -64,6 +67,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.fwd_btn = self.ui.findChild(QtWidgets.QPushButton, 'fwdbtn')
         self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
+        self.alpha_sort = self.ui.findChild(QtWidgets.QPushButton, 'alphasort')
         self.home_btn = self.ui.findChild(QtWidgets.QPushButton, 'homebtn')
         self.reset_btn = self.ui.findChild(QtWidgets.QPushButton, 'resetbtn')
         self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
@@ -75,6 +79,8 @@ class ProjectManager(QtWidgets.QWidget):
         self.default_proj_name = self.proj_name.text()
         self.default_proj_path = self.proj_path.text()
         self.default_job_path = self.job_path.text()
+
+        self.current_order = Qt.AscendingOrder
 
         back_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                          '/back.svg'
@@ -96,10 +102,17 @@ class ProjectManager(QtWidgets.QWidget):
         home_icon = QtGui.QIcon(home_icon_path)
         self.home_btn.setIcon(home_icon)
 
+        alpha_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
+                          '/adaptpixelrange.svg'
+        alpha_icon = QtGui.QIcon(alpha_icon_path)
+        self.alpha_sort.setIcon(alpha_icon)
+
+
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
+        self.alpha_sort.clicked.connect(self.alpha_sort_button)
         self.fwd_btn.clicked.connect(self.redo_click_forward)
         self.ref_btn.clicked.connect(self.refresh_current_scene_list)
         self.home_btn.clicked.connect(self.go_to_job_dir)
@@ -279,6 +292,14 @@ class ProjectManager(QtWidgets.QWidget):
 
     def refresh_current_scene_list(self):
         self.update_scene_list()
+
+    def alpha_sort_button(self):
+        if self.current_order == Qt.AscendingOrder:
+            self.scene_list.sortItems(Qt.DescendingOrder)
+            self.current_order = Qt.DescendingOrder
+        else:
+            self.scene_list.sortItems(Qt.AscendingOrder)
+            self.current_order = Qt.AscendingOrder
 
     def search_directories(self):
         query = self.search_bar.text()
