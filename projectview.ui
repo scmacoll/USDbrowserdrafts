@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>650</height>
+    <width>766</width>
+    <height>383</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,69 +16,23 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item alignment="Qt::AlignLeft">
-        <widget class="QLabel" name="projname">
-         <property name="font">
-          <font>
-           <pointsize>16</pointsize>
-          </font>
-         </property>
+     <item row="7" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
          <property name="text">
-          <string>Select a Project</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <string>Import</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignRight">
-        <widget class="QPushButton" name="setproj">
-         <property name="sizeIncrement">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="baseSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-           <kerning>true</kerning>
-          </font>
-         </property>
+       <item>
+        <widget class="QPushButton" name="resetbtn">
          <property name="text">
-          <string>Set Project</string>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>16</width>
-           <height>16</height>
-          </size>
+          <string>Reset</string>
          </property>
         </widget>
        </item>
       </layout>
-     </item>
-     <item row="6" column="0">
-      <widget class="QListWidget" name="scenelist">
-       <property name="viewMode">
-        <enum>QListView::ListMode</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="projpath">
-       <property name="text">
-        <string>Path :  /</string>
-       </property>
-      </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="jobpath">
@@ -87,8 +41,12 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+     <item row="6" column="0">
+      <widget class="QListWidget" name="scenelist">
+       <property name="viewMode">
+        <enum>QListView::ListMode</enum>
+       </property>
+      </widget>
      </item>
      <item row="4" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -137,23 +95,78 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2"/>
-       </item>
-      </layout>
-     </item>
-     <item row="7" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QLineEdit" name="lineEdit">
          <property name="text">
-          <string>Import</string>
+          <string/>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+         <property name="placeholderText">
+          <string> search</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="resetbtn">
+        <layout class="QVBoxLayout" name="verticalLayout_2"/>
+       </item>
+      </layout>
+     </item>
+     <item row="5" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="projpath">
+       <property name="text">
+        <string>Path :  /</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item alignment="Qt::AlignLeft">
+        <widget class="QLabel" name="projname">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
          <property name="text">
-          <string>Reset</string>
+          <string>Select a Project</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignRight">
+        <widget class="QPushButton" name="setproj">
+         <property name="sizeIncrement">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+           <kerning>true</kerning>
+          </font>
+         </property>
+         <property name="text">
+          <string>Set Project</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
          </property>
         </widget>
        </item>

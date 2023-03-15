@@ -1,8 +1,5 @@
 import os
 import hou
-import sys
-import importlib
-import toolutils
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
 
@@ -74,6 +71,10 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
 
+        self.default_proj_name = self.proj_name.text()
+        self.default_proj_path = self.proj_path.text()
+        self.default_job_path = self.job_path.text()
+
         back_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                          '/back.svg'
         back_icon = QtGui.QIcon(back_icon_path)
@@ -116,10 +117,18 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
 
-    # reload current python panel interface
+        # reload current python panel interface
     def reset_button(self):
-        print("    RESET    ")
+        self.tree = Tree()
+        self.current_node = self.tree.root
+        self.back_stack.clear()
+        self.proj = None
 
+        self.proj_name.setText(self.default_proj_name)
+        self.proj_path.setText(self.default_proj_path)
+        self.job_path.setText(self.default_job_path)
+
+        self.scene_list.clear()
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
