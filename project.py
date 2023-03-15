@@ -70,6 +70,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
+        self.search_bar = self.ui.findChild(QtWidgets.QLineEdit, 'searchbar')
 
         self.default_proj_name = self.proj_name.text()
         self.default_proj_path = self.proj_path.text()
@@ -104,8 +105,10 @@ class ProjectManager(QtWidgets.QWidget):
         self.home_btn.clicked.connect(self.go_to_job_dir)
         self.reset_btn.clicked.connect(self.reset_button)
         self.scene_list.doubleClicked.connect(self.double_click_forward)
+        self.search_bar.textChanged.connect(self.search_directories)
 
-        # Create layout (how widgets will be organised)
+
+# Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
         main_layout.addWidget(self.ui)
@@ -276,4 +279,24 @@ class ProjectManager(QtWidgets.QWidget):
 
     def refresh_current_scene_list(self):
         self.update_scene_list()
+
+    def search_directories(self):
+        query = self.search_bar.text()
+        if query:
+            self.scene_list.clear()
+            self.current_node.subdirs_present = False
+            items = os.listdir(self.current_node.path)
+            items.sort()
+            for file in items:
+                path = os.path.join(self.current_node.path, file)
+                if os.path.isdir(path) and query.lower() in file.lower():
+                    self.scene_list.addItem(file)
+                    self.tree.add_path(path + '/')
+                    self.tree.node = self.current_node
+                    self.current_node.subdirs_present = True
+                elif file.endswith('.usda') and query.lower() in file.lower():
+                    self.scene_list.addItem(file)
+        else:
+            self.update_scene_list()
+
 
