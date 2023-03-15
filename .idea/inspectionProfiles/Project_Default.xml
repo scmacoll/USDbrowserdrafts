@@ -52,6 +52,7 @@
           <option value="project.Node.subdirs_present" />
           <option value="object.clearSelection" />
           <option value="object.itemAt" />
+          <option value="hou.paneTabType.PythonPanel" />
         </list>
       </option>
     </inspection_tool>

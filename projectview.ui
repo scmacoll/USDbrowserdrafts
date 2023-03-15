@@ -115,13 +115,24 @@
         </widget>
        </item>
        <item>
-        <widget class="QCommandLinkButton" name="rebtn">
+        <widget class="QCommandLinkButton" name="refbtn">
          <property name="text">
           <string/>
          </property>
          <property name="icon">
           <iconset>
            <normaloff>../../../../../../../Documents/3D/QtDesigner/icons/BUTTONS/reload.svg</normaloff>../../../../../../../Documents/3D/QtDesigner/icons/BUTTONS/reload.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCommandLinkButton" name="homebtn">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../../../../../../../Documents/3D/QtDesigner/icons/IMAGE/home.svg</normaloff>../../../../../../../Documents/3D/QtDesigner/icons/IMAGE/home.svg</iconset>
          </property>
         </widget>
        </item>
@@ -140,7 +151,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="resetbtn">
          <property name="text">
           <string>Reset</string>
          </property>

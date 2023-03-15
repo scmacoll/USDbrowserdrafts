@@ -1,6 +1,10 @@
 import os
 import hou
+import sys
+import importlib
+import toolutils
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
+
 
 
 class Node:
@@ -62,7 +66,9 @@ class ProjectManager(QtWidgets.QWidget):
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
         self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.fwd_btn = self.ui.findChild(QtWidgets.QPushButton, 'fwdbtn')
-        self.re_btn = self.ui.findChild(QtWidgets.QPushButton, 'rebtn')
+        self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
+        self.home_btn = self.ui.findChild(QtWidgets.QPushButton, 'homebtn')
+        self.reset_btn = self.ui.findChild(QtWidgets.QPushButton, 'resetbtn')
         self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
         self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
@@ -78,17 +84,24 @@ class ProjectManager(QtWidgets.QWidget):
         fwd_icon = QtGui.QIcon(fwd_icon_path)
         self.fwd_btn.setIcon(fwd_icon)
 
-        re_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
-                       '/reload.svg'
-        re_icon = QtGui.QIcon(re_icon_path)
-        self.re_btn.setIcon(re_icon)
+        ref_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
+                        '/reload.svg'
+        ref_icon = QtGui.QIcon(ref_icon_path)
+        self.ref_btn.setIcon(ref_icon)
+
+        home_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
+                         '/home.svg'
+        home_icon = QtGui.QIcon(home_icon_path)
+        self.home_btn.setIcon(home_icon)
 
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
         self.fwd_btn.clicked.connect(self.redo_click_forward)
-        self.re_btn.clicked.connect(self.refresh_current_scene_list)
+        self.ref_btn.clicked.connect(self.refresh_current_scene_list)
+        self.home_btn.clicked.connect(self.go_to_job_dir)
+        self.reset_btn.clicked.connect(self.reset_button)
         self.scene_list.doubleClicked.connect(self.double_click_forward)
 
         # Create layout (how widgets will be organised)
@@ -101,13 +114,38 @@ class ProjectManager(QtWidgets.QWidget):
         # override mousePressEvent for scene_list widget (to clear selection
         # on left click) (see below)
         self.scene_list.mousePressEvent = self.mousePressEvent
+        self.scene_list.keyPressEvent = self.keyPressEvent
+
+    # reload current python panel interface
+    def reset_button(self):
+        print("    RESET    ")
+
 
     def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:  # left click
-            item = self.scene_list.itemAt(event.pos())  # get item at click
-            if not item:  # if no item at click
-                self.scene_list.clearSelection()  # clear selection
-            super(ProjectManager, self).mousePressEvent(event)
+        if event.button() == QtCore.Qt.LeftButton:
+            item = self.scene_list.itemAt(event.pos())
+            if item:
+                if item.isSelected():
+                    self.scene_list.clearSelection()
+            else:
+                self.scene_list.clearSelection()
+        super(ProjectManager, self).mousePressEvent(event)
+
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.scene_list.clearSelection()
+            super(ProjectManager, self).keyPressEvent(event)
+        elif event.key() == QtCore.Qt.Key_Backspace:
+            self.scene_list.clearSelection()
+            super(ProjectManager, self).keyPressEvent(event)
+        elif event.key() == QtCore.Qt.Key_Delete:
+            self.scene_list.clearSelection()
+            super(ProjectManager, self).keyPressEvent(event)
+        elif event.key() == QtCore.Qt.Key_Return:
+            self.double_click_forward()
+        else:
+            return
 
     def set_project(self):
         set_job = hou.ui.selectFile(title='Select Project Folder',
@@ -128,6 +166,10 @@ class ProjectManager(QtWidgets.QWidget):
 
         #  Create a Node Instance
         self.current_node = self.tree.root
+        self.update_scene_list()
+
+    def go_to_job_dir(self):
+        self.current_node.path = self.proj
         self.update_scene_list()
 
     def update_scene_list(self):
@@ -158,6 +200,7 @@ class ProjectManager(QtWidgets.QWidget):
         return self.scene_list
 
     def back_button(self):
+        print(len(self.back_stack))
         print("<<<    back button pressed! :D    >>>")
         home_dir = os.path.expanduser("~")
         job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME',
@@ -200,6 +243,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.update_scene_list()
 
     def double_click_forward(self):
+        self.back_stack.clear()
         self.forward_button()
 
     def redo_click_forward(self):
@@ -223,3 +267,4 @@ class ProjectManager(QtWidgets.QWidget):
 
     def refresh_current_scene_list(self):
         self.update_scene_list()
+
