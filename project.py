@@ -190,6 +190,14 @@ class ProjectManager(QtWidgets.QWidget):
             print(self.enter_pressed_on_search_bar)
             super(ProjectManager, self).keyPressEvent(event)
 
+        elif event.key() == QtCore.Qt.Key_Left:
+            if self.scene_list.hasFocus():
+                self.back_button()
+
+        elif event.key() == QtCore.Qt.Key_Right:
+            if self.scene_list.hasFocus():
+                self.double_click_forward()
+
         elif event.matches(QKeySequence("Ctrl+Backspace")) and \
                 self.search_bar.hasFocus():
             self.search_bar.clear()
@@ -248,7 +256,7 @@ class ProjectManager(QtWidgets.QWidget):
                 self.tree.add_path(path + '/')  # sequential paths added
                 self.tree.node = self.current_node
                 self.current_node.subdirs_present = True
-            elif file.endswith('.usda'):
+            elif file.endswith('.usda') or file.endswith('.usdc'):
                 self.scene_list.addItem(file)
 
         return self.scene_list
@@ -283,8 +291,8 @@ class ProjectManager(QtWidgets.QWidget):
                     self.current_node = child
                     self.update_scene_list()
                     break
-        elif selected_item is not None and selected_item.text().endswith(
-                '.usda'):
+        elif selected_item is not None and selected_item.text(
+                ).endswith(('.usda', '.usdc')):
             print("you have selected a .USD file")
             return
         else:
