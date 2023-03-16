@@ -119,7 +119,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.doubleClicked.connect(self.double_click_forward)
         self.search_bar.textChanged.connect(self.search_directories)
 
-# Create layout (how widgets will be organised)
+        # Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
         main_layout.addWidget(self.ui)
@@ -165,7 +165,7 @@ class ProjectManager(QtWidgets.QWidget):
                 self.scene_list.clearSelection()
                 self.search_bar.setFocus()
             else:
-                self.scene_list.clearFocus()  # ? need to fix
+                # self.scene_list.clearFocus()  # ? need to fix
                 self.scene_list.clearSelection()
 
             super(ProjectManager, self).keyPressEvent(event)
