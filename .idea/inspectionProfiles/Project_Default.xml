@@ -14,6 +14,7 @@
         <list>
           <option value="E303" />
           <option value="E713" />
+          <option value="E501" />
         </list>
       </option>
     </inspection_tool>
@@ -55,6 +56,7 @@
           <option value="object.itemAt" />
           <option value="hou.paneTabType.PythonPanel" />
           <option value="object.*" />
+          <option value="PySide2.QtWidgets.QFontMetrics" />
         </list>
       </option>
     </inspection_tool>

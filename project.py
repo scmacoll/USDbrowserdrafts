@@ -249,13 +249,38 @@ class ProjectManager(QtWidgets.QWidget):
         items = os.listdir(self.current_node.path)
         items.sort()
 
+        max_usdc_width = 0
         for file in items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
-                self.scene_list.addItem(file)
+                usda_file_count = 0
+                usdc_file_count = 0
+                for root, dirs, files in os.walk(path):
+                    for filename in files:
+                        if filename.endswith('.usda'):
+                            usda_file_count += 1
+                        elif filename.endswith('.usdc'):
+                            usdc_file_count += 1
+
+                item_text = f"({usda_file_count})  ({usdc_file_count})"
+                item = QtWidgets.QListWidgetItem(f"{file}")
+                item.setTextAlignment(QtCore.Qt.AlignLeft)
+
+                item_widget = QtWidgets.QWidget()
+                item_layout = QtWidgets.QHBoxLayout(item_widget)
+                item_layout.setContentsMargins(0, 0, 0, 0)
+
+                item_label = QtWidgets.QLabel(item_text)
+                item_label.setAlignment(QtCore.Qt.AlignRight)
+                item_layout.addWidget(item_label)
+
+                self.scene_list.addItem(item)
+                self.scene_list.setItemWidget(item, item_widget)
+
                 self.tree.add_path(path + '/')  # sequential paths added
                 self.tree.node = self.current_node
                 self.current_node.subdirs_present = True
+
             elif file.endswith('.usda') or file.endswith('.usdc'):
                 self.scene_list.addItem(file)
 

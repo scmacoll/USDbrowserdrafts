@@ -217,3 +217,6 @@ class ProjectManager(QtWidgets.QWidget):
                 #     lambda item: print("importing usda"))
 
         return self.scene_list
+
+
+
