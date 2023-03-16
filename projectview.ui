@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>766</width>
+    <width>1042</width>
     <height>383</height>
    </rect>
   </property>
@@ -106,20 +106,30 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="searchbar">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
-         <property name="placeholderText">
-          <string> search</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2"/>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QLineEdit" name="searchbar">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="cursorPosition">
+            <number>0</number>
+           </property>
+           <property name="dragEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+           <property name="placeholderText">
+            <string> search</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>

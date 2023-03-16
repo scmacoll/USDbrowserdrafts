@@ -1,10 +1,9 @@
 import os
-
-from PySide2.QtCore import Qt
-
 import hou
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QLineEdit
+from PySide2.QtGui import QKeySequence
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
-
 
 
 class Node:
@@ -120,7 +119,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.doubleClicked.connect(self.double_click_forward)
         self.search_bar.textChanged.connect(self.search_directories)
 
-
 # Create layout (how widgets will be organised)
         main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
@@ -128,8 +126,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.setLayout(main_layout)
 
-        # override mousePressEvent for scene_list widget (to clear selection
-        # on left click) (see below)
+        self.enter_pressed_on_search_bar = False
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
 
@@ -143,6 +140,8 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj_name.setText(self.default_proj_name)
         self.proj_path.setText(self.default_proj_path)
         self.job_path.setText(self.default_job_path)
+        self.search_bar.installEventFilter(self)
+
 
         self.scene_list.clear()
 
@@ -154,23 +153,53 @@ class ProjectManager(QtWidgets.QWidget):
                     self.scene_list.clearSelection()
             else:
                 self.scene_list.clearSelection()
+        self.enter_pressed_on_search_bar = False
         super(ProjectManager, self).mousePressEvent(event)
 
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
-            self.scene_list.clearSelection()
+            if self.search_bar.hasFocus():
+                self.search_bar.clearFocus()
+            elif self.enter_pressed_on_search_bar:
+                self.scene_list.clearSelection()
+                self.search_bar.setFocus()
+            else:
+                self.scene_list.clearFocus()  # ? need to fix
+                self.scene_list.clearSelection()
+
             super(ProjectManager, self).keyPressEvent(event)
+
         elif event.key() == QtCore.Qt.Key_Backspace:
             self.scene_list.clearSelection()
             super(ProjectManager, self).keyPressEvent(event)
+
         elif event.key() == QtCore.Qt.Key_Delete:
             self.scene_list.clearSelection()
             super(ProjectManager, self).keyPressEvent(event)
+
         elif event.key() == QtCore.Qt.Key_Return:
-            self.double_click_forward()
-        else:
-            return
+            if self.search_bar.hasFocus():
+                self.search_bar.clearFocus()
+                self.scene_list.setCurrentRow(0)
+                self.scene_list.setFocus()
+                self.enter_pressed_on_search_bar = True
+            else:
+                self.double_click_forward()
+                self.enter_pressed_on_search_bar = False
+            print(self.enter_pressed_on_search_bar)
+            super(ProjectManager, self).keyPressEvent(event)
+
+        elif event.matches(QKeySequence("Ctrl+Backspace")) and \
+                self.search_bar.hasFocus():
+            self.search_bar.clear()
+            super(ProjectManager, self).keyPressEvent(event)
+
+    def keyReleaseEvent(self, event):
+        if event.key() not in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down,
+                               QtCore.Qt.Key_Return):
+            self.enter_pressed_on_search_bar = False
+        super(ProjectManager, self).keyReleaseEvent(event)
 
     def set_project(self):
         set_job = hou.ui.selectFile(title='Select Project Folder',

@@ -31,6 +31,7 @@
         </list>
       </option>
     </inspection_tool>
+    <inspection_tool class="PyTypeCheckerInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredIdentifiers">
         <list>
@@ -53,6 +54,7 @@
           <option value="object.clearSelection" />
           <option value="object.itemAt" />
           <option value="hou.paneTabType.PythonPanel" />
+          <option value="object.*" />
         </list>
       </option>
     </inspection_tool>
