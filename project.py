@@ -1,8 +1,8 @@
 import os
 import hou
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QLineEdit
-from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import QLineEdit, QListWidgetItem
+from PySide2.QtGui import QKeySequence, QBrush, QColor
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
 
@@ -290,16 +290,35 @@ class ProjectManager(QtWidgets.QWidget):
                                 f"{usdc_file_count}) "
 
                 item = QtWidgets.QListWidgetItem(f"{file}")
+                item.setTextAlignment(QtCore.Qt.AlignLeft)
 
                 item_widget = QtWidgets.QWidget()
                 item_layout = QtWidgets.QHBoxLayout(item_widget)
                 item_layout.setContentsMargins(0, 0, 0, 0)
 
-                item_label = QtWidgets.QLabel(item_text)
-                item.setTextAlignment(QtCore.Qt.AlignLeft)
                 font = QtGui.QFont("Consolas", 12)
-                item_label.setFont(font)
+
+                usda_label = QtWidgets.QLabel(f"({usda_file_count})")
+                usda_label.setFont(font)
+                usda_label.setAlignment(QtCore.Qt.AlignRight)
+                usda_label.setStyleSheet("color: blue;")
+
+                usdc_label = QtWidgets.QLabel(f"({usdc_file_count})")
+                usdc_label.setFont(font)
+                usdc_label.setAlignment(QtCore.Qt.AlignRight)
+                usdc_label.setStyleSheet("color: green;")
+
+                if usda_file_count == 0:
+                    usda_label.setText('   ')
+                if usdc_file_count == 0:
+                    usdc_label.setText('   ')
+
+                item_label = QtWidgets.QLabel(item_text)
                 item_label.setAlignment(QtCore.Qt.AlignRight)
+                # item_label.setFont(font)
+
+                item_layout.addWidget(usda_label)
+                item_layout.addWidget(usdc_label)
                 item_layout.addWidget(item_label)
 
                 usd_items.append((item, item_widget))
