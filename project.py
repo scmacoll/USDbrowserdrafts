@@ -275,19 +275,30 @@ class ProjectManager(QtWidgets.QWidget):
                             usdc_file_count += 1
 
                 str_length = len(str(usdc_file_count))
-                usdc_padding = ' ' * (max_usdc_width - str_length)
+                usdc_padding = '&nbsp;' * (max_usdc_width - str_length)
+                #
+                # item_text = f"<font color='#1F8ECD'>(" \
+                #             f"{usda_file_count})</font>{usdc_padding}  " \
+                #             f"<font color='#5DAADA'>" \
+                #             f"({usdc_file_count})</font> "
 
                 if usda_file_count == 0:
-                    usda_file_count = '   '
-                    item_text = f"{usda_file_count}{usdc_padding}    (" \
-                                f"{usdc_file_count}) "
+                    usda_file_count = '&nbsp;' * 3
+                    item_text = f"<font color='#1F8ECD'>" \
+                                f"{usda_file_count}</font>{usdc_padding}  " \
+                                f"<font color='#5DAADA'>" \
+                                f"({usdc_file_count})</font> "
                 elif usdc_file_count == 0:
-                    usdc_file_count = '   '
-                    item_text = f"({usda_file_count}){usdc_padding}    " \
-                                f"{usdc_file_count} "
+                    usdc_file_count = '&nbsp;' * 3
+                    item_text = f"<font color='#1F8ECD'>(" \
+                                f"{usda_file_count})</font>{usdc_padding}  " \
+                                f"<font color='#5DAADA'>" \
+                                f"{usdc_file_count}</font> "
                 else:
-                    item_text = f"({usda_file_count}){usdc_padding}    (" \
-                                f"{usdc_file_count}) "
+                    item_text = f"<font color='#1F8ECD'>(" \
+                                f"{usda_file_count})</font>{usdc_padding}  " \
+                                f"<font color='#5DAADA'>" \
+                                f"({usdc_file_count})</font> "
 
                 item = QtWidgets.QListWidgetItem(f"{file}")
                 item.setTextAlignment(QtCore.Qt.AlignLeft)
@@ -298,27 +309,16 @@ class ProjectManager(QtWidgets.QWidget):
 
                 font = QtGui.QFont("Consolas", 12)
 
-                usda_label = QtWidgets.QLabel(f"({usda_file_count})")
-                usda_label.setFont(font)
-                usda_label.setAlignment(QtCore.Qt.AlignRight)
-                usda_label.setStyleSheet("color: blue;")
-
-                usdc_label = QtWidgets.QLabel(f"({usdc_file_count})")
-                usdc_label.setFont(font)
-                usdc_label.setAlignment(QtCore.Qt.AlignRight)
-                usdc_label.setStyleSheet("color: green;")
-
-                if usda_file_count == 0:
-                    usda_label.setText('   ')
-                if usdc_file_count == 0:
-                    usdc_label.setText('   ')
-
                 item_label = QtWidgets.QLabel(item_text)
                 item_label.setAlignment(QtCore.Qt.AlignRight)
-                # item_label.setFont(font)
+                item_label.setFont(font)
 
-                item_layout.addWidget(usda_label)
-                item_layout.addWidget(usdc_label)
+                # item_label.setText(item_text.replace(
+                #     f"({usda_file_count})", f"<font color='#1F8ECD'>({usda_file_count})</font>"))
+                # item_label.setText(item_text.replace(
+                #     f"({usdc_file_count})", f"<font color='#5DAADA'>({usdc_file_count})</font>"))
+
+                # item_layout.addWidget(usdc_label)
                 item_layout.addWidget(item_label)
 
                 usd_items.append((item, item_widget))
