@@ -249,7 +249,6 @@ class ProjectManager(QtWidgets.QWidget):
         items = os.listdir(self.current_node.path)
         items.sort()
 
-        max_usdc_width = 0
         for file in items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
