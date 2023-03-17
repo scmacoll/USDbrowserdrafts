@@ -242,14 +242,16 @@ class ProjectManager(QtWidgets.QWidget):
         if self.current_node.path[-2:] == '//':
             self.current_node.path = self.current_node.path[:-1]
 
-        print("current node:    " + str(self.current_node))
-        print("node path:    " + self.current_node.path)
-        print("node children []:    " + str(self.current_node.children))
+        # print("current node:    " + str(self.current_node))
+        # print("node path:    " + self.current_node.path)
+        # print("node children []:    " + str(self.current_node.children))
 
         items = os.listdir(self.current_node.path)
         items.sort()
 
         max_usdc_width = 0
+        usd_items = []
+        non_usd_items = []
         for file in items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
@@ -300,15 +302,33 @@ class ProjectManager(QtWidgets.QWidget):
                 item_label.setAlignment(QtCore.Qt.AlignRight)
                 item_layout.addWidget(item_label)
 
-                self.scene_list.addItem(item)
-                self.scene_list.setItemWidget(item, item_widget)
+                usd_items.append((item, item_widget))
 
                 self.tree.add_path(path + '/')  # sequential paths added
                 self.tree.node = self.current_node
                 self.current_node.subdirs_present = True
 
             elif file.endswith('.usda') or file.endswith('.usdc'):
-                self.scene_list.addItem(file)
+                non_usd_items.append(file)
+
+
+        # Add the usd items
+        for item, item_widget in usd_items:
+            self.scene_list.addItem(item)
+            self.scene_list.setItemWidget(item, item_widget)
+
+        # Add a separator item
+        if non_usd_items and usd_items:
+            separator = QtWidgets.QListWidgetItem()
+            separator.setFlags(QtCore.Qt.NoItemFlags)
+            separator.setSizeHint(QtCore.QSize(0, 10))
+            separator.setBackground(
+                QtGui.QColor(128, 128, 128))  # Set the background color to gray
+            self.scene_list.addItem(separator)
+
+        # Add the non-usd items first
+        for item in non_usd_items:
+            self.scene_list.addItem(item)
 
         return self.scene_list
 
