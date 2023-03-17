@@ -273,23 +273,19 @@ class ProjectManager(QtWidgets.QWidget):
                             usdc_file_count += 1
 
                 str_length = len(str(usdc_file_count))
-                usdc_padding = '   ' * (max_usdc_width - str_length)
+                usdc_padding = ' ' * (max_usdc_width - str_length)
 
                 if usda_file_count == 0:
-                    usda_file_count = '    '
+                    usda_file_count = '   '
                     item_text = f"{usda_file_count}{usdc_padding}    (" \
-                                f"{usdc_file_count})  "
+                                f"{usdc_file_count}) "
                 elif usdc_file_count == 0:
-                    usdc_file_count = '      '
+                    usdc_file_count = '   '
                     item_text = f"({usda_file_count}){usdc_padding}    " \
-                                f"{usdc_file_count}  "
+                                f"{usdc_file_count} "
                 else:
                     item_text = f"({usda_file_count}){usdc_padding}    (" \
-                                f"{usdc_file_count})  "
-
-                '      '
-                '      '
-
+                                f"{usdc_file_count}) "
 
                 item = QtWidgets.QListWidgetItem(f"{file}")
 
@@ -299,8 +295,8 @@ class ProjectManager(QtWidgets.QWidget):
 
                 item_label = QtWidgets.QLabel(item_text)
                 item.setTextAlignment(QtCore.Qt.AlignLeft)
-                # font = QtGui.QFont("Consolas", 11)
-                # item_label.setFont(font)
+                font = QtGui.QFont("Consolas", 12)
+                item_label.setFont(font)
                 item_label.setAlignment(QtCore.Qt.AlignRight)
                 item_layout.addWidget(item_label)
 
