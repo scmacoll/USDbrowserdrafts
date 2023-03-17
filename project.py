@@ -249,6 +249,17 @@ class ProjectManager(QtWidgets.QWidget):
         items = os.listdir(self.current_node.path)
         items.sort()
 
+        max_usdc_width = 0
+        for file in items:
+            path = os.path.join(self.current_node.path, file)
+            if os.path.isdir(path):
+                usdc_file_count = 0
+                for root, dirs, files in os.walk(path):
+                    for filename in files:
+                        if filename.endswith('.usdc'):
+                            usdc_file_count += 1
+                max_usdc_width = max(max_usdc_width, len(str(usdc_file_count)))
+
         for file in items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
@@ -261,15 +272,35 @@ class ProjectManager(QtWidgets.QWidget):
                         elif filename.endswith('.usdc'):
                             usdc_file_count += 1
 
-                item_text = f"({usda_file_count})  ({usdc_file_count})"
+                str_length = len(str(usdc_file_count))
+                usdc_padding = '   ' * (max_usdc_width - str_length)
+
+                if usda_file_count == 0:
+                    usda_file_count = '    '
+                    item_text = f"{usda_file_count}{usdc_padding}    (" \
+                                f"{usdc_file_count})  "
+                elif usdc_file_count == 0:
+                    usdc_file_count = '      '
+                    item_text = f"({usda_file_count}){usdc_padding}    " \
+                                f"{usdc_file_count}  "
+                else:
+                    item_text = f"({usda_file_count}){usdc_padding}    (" \
+                                f"{usdc_file_count})  "
+
+                '      '
+                '      '
+
+
                 item = QtWidgets.QListWidgetItem(f"{file}")
-                item.setTextAlignment(QtCore.Qt.AlignLeft)
 
                 item_widget = QtWidgets.QWidget()
                 item_layout = QtWidgets.QHBoxLayout(item_widget)
                 item_layout.setContentsMargins(0, 0, 0, 0)
 
                 item_label = QtWidgets.QLabel(item_text)
+                item.setTextAlignment(QtCore.Qt.AlignLeft)
+                # font = QtGui.QFont("Consolas", 11)
+                # item_label.setFont(font)
                 item_label.setAlignment(QtCore.Qt.AlignRight)
                 item_layout.addWidget(item_label)
 
