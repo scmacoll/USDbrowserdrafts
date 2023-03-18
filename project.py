@@ -106,6 +106,12 @@ class ProjectManager(QtWidgets.QWidget):
         alpha_icon = QtGui.QIcon(alpha_icon_path)
         self.alpha_sort.setIcon(alpha_icon)
 
+        set_proj_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder.svg'
+        set_proj_icon = QtGui.QIcon(set_proj_icon_path)
+        self.set_proj.setIcon(set_proj_icon)
+
+
+
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
@@ -224,7 +230,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.current_node = self.tree.root  # create a new node
         self.tree.add_path(self.proj)  # add path to tree node
 
-        proj_name = 'Project:  ' + set_job.split('/')[-2]
+        proj_name = 'USD Project:  ' + set_job.split('/')[-2]
         set_job = 'JOB:  ' + os.path.dirname(set_job)
         proj_path = 'Path:  ' + set_job
         self.proj_name.setText(proj_name)
@@ -362,11 +368,24 @@ class ProjectManager(QtWidgets.QWidget):
         if usd_items and non_usd_items:
             separator = QtWidgets.QListWidgetItem()
             separator.setFlags(QtCore.Qt.NoItemFlags)
-            separator.setSizeHint(QtCore.QSize(0, 10))
+            separator.setSizeHint(QtCore.QSize(0, 20))
             separator.setBackground(
                 QtGui.QColor(128, 128,
                              128))  # Set the background color to gray
+
+            line = QtWidgets.QFrame()
+            line.setFrameShape(QtWidgets.QFrame.HLine)
+            line.setFrameShadow(QtWidgets.QFrame.Sunken)
+            line.setLineWidth(1)
+
+            # Set the background color of the separator
+            palette = line.palette()
+            palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(128, 128, 128))
+            line.setPalette(palette)
+
+            # Add the line widget to the separator list widget item
             self.scene_list.addItem(separator)
+            self.scene_list.setItemWidget(separator, line)
 
         # Add usd items
         for item in usd_items:
