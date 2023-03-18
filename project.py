@@ -12,7 +12,7 @@ class Node:
         self.children = []
 
     def add_child(self, node):
-        print("Adding child:", node.path)
+        # print("Adding child:", node.path)
         self.children.append(node)
 
 
@@ -21,10 +21,10 @@ class Tree:
         self.root = Node(root)
 
     def add_path(self, path):
-        print("Adding path:", path)
+        # print("Adding path:", path)
         current = self.root
         for part in path.split(os.sep):
-            print("part:    " + part)
+            # print("part:    " + part)
             if not part:
                 continue
             found = None
@@ -106,7 +106,6 @@ class ProjectManager(QtWidgets.QWidget):
         alpha_icon = QtGui.QIcon(alpha_icon_path)
         self.alpha_sort.setIcon(alpha_icon)
 
-
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
@@ -131,6 +130,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.keyPressEvent = self.keyPressEvent
 
         # reload current python panel interface
+
     def reset_button(self):
         self.tree = Tree()
         self.current_node = self.tree.root
@@ -141,7 +141,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj_path.setText(self.default_proj_path)
         self.job_path.setText(self.default_job_path)
         self.search_bar.installEventFilter(self)
-
 
         self.scene_list.clear()
 
@@ -155,7 +154,6 @@ class ProjectManager(QtWidgets.QWidget):
                 self.scene_list.clearSelection()
         self.enter_pressed_on_search_bar = False
         super(ProjectManager, self).mousePressEvent(event)
-
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
@@ -278,7 +276,15 @@ class ProjectManager(QtWidgets.QWidget):
                 str_length = len(str(usdc_file_count))
                 usdc_padding = '&nbsp;' * (max_usdc_width - str_length)
 
-                if usda_file_count == 0:
+
+                if usda_file_count == 0 and usdc_file_count == 0:
+                    usda_file_count = '&nbsp;' * 3
+                    usdc_file_count = '&nbsp;' * 3
+                    item_text = f"<font color='#1F8ECD'>" \
+                                f"{usda_file_count}</font>{usdc_padding}  " \
+                                f"<font color='#5DAADA'>" \
+                                f"{usdc_file_count}</font> "
+                elif usda_file_count == 0:
                     usda_file_count = '&nbsp;' * 3
                     item_text = f"<font color='#1F8ECD'>" \
                                 f"{usda_file_count}</font>{usdc_padding}  " \
@@ -342,7 +348,8 @@ class ProjectManager(QtWidgets.QWidget):
             separator.setFlags(QtCore.Qt.NoItemFlags)
             separator.setSizeHint(QtCore.QSize(0, 10))
             separator.setBackground(
-                QtGui.QColor(128, 128, 128))  # Set the background color to gray
+                QtGui.QColor(128, 128,
+                             128))  # Set the background color to gray
             self.scene_list.addItem(separator)
 
         # Add usd items
@@ -382,7 +389,7 @@ class ProjectManager(QtWidgets.QWidget):
                     self.update_scene_list()
                     break
         elif selected_item is not None and selected_item.text(
-                ).endswith(('.usda', '.usdc')):
+        ).endswith(('.usda', '.usdc')):
             print("you have selected a .USD file")
             return
         else:
@@ -446,5 +453,3 @@ class ProjectManager(QtWidgets.QWidget):
                     self.scene_list.addItem(file)
         else:
             self.update_scene_list()
-
-
