@@ -300,46 +300,44 @@ class ProjectManager(QtWidgets.QWidget):
                 item.setTextAlignment(QtCore.Qt.AlignLeft)
 
                 item_widget = QtWidgets.QWidget()
-                item_layout = QtWidgets.QHBoxLayout(item_widget)
-                item_layout.setContentsMargins(0, 0, 0, 0)
-
 
                 item_label = QtWidgets.QLabel(item_text)
                 item_label.setAlignment(QtCore.Qt.AlignRight)
                 item_label.setFont(font)
 
+                item_layout = QtWidgets.QHBoxLayout(item_widget)
+                item_layout.setContentsMargins(0, 0, 0, 0)
                 item_layout.addWidget(item_label)
 
-                usd_items.append((item, item_widget))
+                non_usd_items.append((item, item_widget))
 
                 self.tree.add_path(path + '/')  # sequential paths added
                 self.tree.node = self.current_node
                 self.current_node.subdirs_present = True
 
-            elif file.endswith('.usda') or file.endswith('.usdc'):
-                if file.endswith('.usda') or file.endswith('.usdc'):
-                    file = QtWidgets.QListWidgetItem(f"<font "
-                                                     f"color='#1F8ECD'>"
-                                                     f"{file}</font>")
-                elif file.endswith('.usdc'):
-                    file = QtWidgets.QListWidgetItem(f"<font "
-                                                     f"color='#5DAADA'"
-                                                     f"{file}</font>")
-                print(">>>>>>>>>>>>>>>>>>>    file:    ", file)
+            elif file.endswith('.usda'):
+                list_widget = QtWidgets.QListWidget()
+                file = QtWidgets.QListWidgetItem(file)
+                file.setForeground(QtGui.QColor('#1F8ECD'))
 
-                # ? Need to edit
+                list_widget.addItem(file.text())
+                usd_items.append(file)
 
-                non_usd_items.append(file)
+            elif file.endswith('.usdc'):
+                list_widget = QtWidgets.QListWidget()
+                file = QtWidgets.QListWidgetItem(file)
+                file.setForeground(QtGui.QColor('#5DAADA'))
 
+                list_widget.addItem(file.text())
+                usd_items.append(file)
 
-
-        # Add the usd items
-        for item, item_widget in usd_items:
+        # Add the non-usd items first
+        for item, item_widget in non_usd_items:
             self.scene_list.addItem(item)
             self.scene_list.setItemWidget(item, item_widget)
 
         # Add a separator item
-        if non_usd_items and usd_items:
+        if usd_items and non_usd_items:
             separator = QtWidgets.QListWidgetItem()
             separator.setFlags(QtCore.Qt.NoItemFlags)
             separator.setSizeHint(QtCore.QSize(0, 10))
@@ -347,8 +345,8 @@ class ProjectManager(QtWidgets.QWidget):
                 QtGui.QColor(128, 128, 128))  # Set the background color to gray
             self.scene_list.addItem(separator)
 
-        # Add the non-usd items first
-        for item in non_usd_items:
+        # Add usd items
+        for item in usd_items:
             self.scene_list.addItem(item)
 
         return self.scene_list
