@@ -125,6 +125,13 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.setLayout(main_layout)
 
+        self.search_bar.setEnabled(False)
+        self.back_btn.setEnabled(False)
+        self.fwd_btn.setEnabled(False)
+        self.alpha_sort.setEnabled(False)
+        self.ref_btn.setEnabled(False)
+        self.home_btn.setEnabled(False)
+
         self.enter_pressed_on_search_bar = False
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
@@ -235,6 +242,15 @@ class ProjectManager(QtWidgets.QWidget):
     def update_scene_list(self):
         self.scene_list.clear()
         self.current_node.subdirs_present = False
+        if self.proj:
+            self.search_bar.setEnabled(True)
+            self.back_btn.setEnabled(True)
+            self.fwd_btn.setEnabled(True)
+            self.alpha_sort.setEnabled(True)
+            self.ref_btn.setEnabled(True)
+            self.home_btn.setEnabled(True)
+
+
 
         self.current_node.path = self.current_node.path + '/'
         if self.current_node.path[-2:] == '//':
