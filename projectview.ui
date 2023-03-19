@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>794</width>
-    <height>524</height>
+    <width>796</width>
+    <height>519</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -229,7 +229,7 @@
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignLeft">
         <widget class="QLineEdit" name="searchbar">
          <property name="enabled">
           <bool>true</bool>
@@ -267,7 +267,7 @@
         </widget>
        </item>
        <item alignment="Qt::AlignLeft">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="cmmt">
          <property name="minimumSize">
           <size>
            <width>40</width>
@@ -281,7 +281,58 @@
           </size>
          </property>
          <property name="text">
-          <string>  comment</string>
+          <string>__</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignVCenter">
+        <widget class="QLabel" name="usdalbl">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: #1F8ECD;
+}</string>
+         </property>
+         <property name="text">
+          <string>usda</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignVCenter">
+        <widget class="QLabel" name="usdclbl">
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel{
+    color: #5DAADA;
+}</string>
+         </property>
+         <property name="text">
+          <string>usdc   </string>
          </property>
         </widget>
        </item>

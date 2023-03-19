@@ -75,6 +75,8 @@ class ProjectManager(QtWidgets.QWidget):
         self.usd_label = self.ui.findChild(QtWidgets.QLabel, 'usdlabel')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
         self.search_bar = self.ui.findChild(QtWidgets.QLineEdit, 'searchbar')
+        self.usda_label = self.ui.findChild(QtWidgets.QLabel, 'usdalbl')
+        self.usdc_label = self.ui.findChild(QtWidgets.QLabel, 'usdclbl')
 
         self.default_proj_name = self.proj_name.text()
         self.default_proj_path = self.proj_path.text()
@@ -140,6 +142,9 @@ class ProjectManager(QtWidgets.QWidget):
         self.alpha_sort.setEnabled(False)
         self.ref_btn.setEnabled(False)
         self.home_btn.setEnabled(False)
+
+        self.usda_label.setVisible(False)
+        self.usdc_label.setVisible(False)
 
         self.enter_pressed_on_search_bar = False
         self.scene_list.mousePressEvent = self.mousePressEvent
@@ -304,6 +309,8 @@ class ProjectManager(QtWidgets.QWidget):
 
 
                 if usda_file_count == 0 and usdc_file_count == 0:
+                    self.usda_label.setVisible(False)
+                    self.usdc_label.setVisible(False)
                     usda_file_count = '&nbsp;' * 3
                     usdc_file_count = '&nbsp;' * 3
                     item_text = f"<font color='#1F8ECD'>" \
@@ -311,18 +318,24 @@ class ProjectManager(QtWidgets.QWidget):
                                 f"<font color='#5DAADA'>" \
                                 f"{usdc_file_count}</font> "
                 elif usda_file_count == 0:
+                    self.usda_label.setVisible(False)
+                    self.usdc_label.setVisible(True)
                     usda_file_count = '&nbsp;' * 3
                     item_text = f"<font color='#1F8ECD'>" \
                                 f"{usda_file_count}</font>{usdc_padding}  " \
                                 f"<font color='#5DAADA'>" \
                                 f"({usdc_file_count})</font> "
                 elif usdc_file_count == 0:
+                    self.usda_label.setVisible(True)
+                    self.usdc_label.setVisible(False)
                     usdc_file_count = '&nbsp;' * 3
                     item_text = f"<font color='#1F8ECD'>(" \
                                 f"{usda_file_count})</font>{usdc_padding}  " \
                                 f"<font color='#5DAADA'>" \
                                 f"{usdc_file_count}</font> "
                 else:
+                    self.usda_label.setVisible(True)
+                    self.usdc_label.setVisible(True)
                     item_text = f"<font color='#1F8ECD'>(" \
                                 f"{usda_file_count})</font>{usdc_padding}  " \
                                 f"<font color='#5DAADA'>" \
