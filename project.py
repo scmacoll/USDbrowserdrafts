@@ -72,6 +72,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
         self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
+        self.usd_label = self.ui.findChild(QtWidgets.QLabel, 'usdlabel')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
         self.search_bar = self.ui.findChild(QtWidgets.QLineEdit, 'searchbar')
 
@@ -109,6 +110,12 @@ class ProjectManager(QtWidgets.QWidget):
         set_proj_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder.svg'
         set_proj_icon = QtGui.QIcon(set_proj_icon_path)
         self.set_proj.setIcon(set_proj_icon)
+
+        usd_label_icon_path = '/Users/stu/Downloads/image2vector(3).svg'
+        usd_label_icon = QtGui.QPixmap(usd_label_icon_path)
+        self.usd_label.setPixmap(usd_label_icon)
+
+
 
 
 
@@ -230,7 +237,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.current_node = self.tree.root  # create a new node
         self.tree.add_path(self.proj)  # add path to tree node
 
-        proj_name = 'USD Project:  ' + set_job.split('/')[-2]
+        proj_name = '  USD Project:  ' + set_job.split('/')[-2]
         set_job = 'JOB:  ' + os.path.dirname(set_job)
         proj_path = 'Path:  ' + set_job
         self.proj_name.setText(proj_name)
