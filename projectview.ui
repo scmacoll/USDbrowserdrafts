@@ -293,8 +293,8 @@
         <widget class="QLabel" name="usdlabel">
          <property name="maximumSize">
           <size>
-           <width>36</width>
-           <height>40</height>
+           <width>28</width>
+           <height>31</height>
           </size>
          </property>
          <property name="font">
@@ -306,7 +306,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../../../../Downloads/image2vector(3).svg</pixmap>
+          <pixmap>../../../../../../../Downloads/image2vector(4).svg</pixmap>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

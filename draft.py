@@ -226,4 +226,8 @@ Alternatively, if you want to sort the items in my_item_list, you could convert 
         # rest of the method code
 
 
-"""This code creates a new QListWidget object called my_list_widget, adds the items from my_item_list to it, sorts the items using sortItems(), and then replaces the items in my_item_list with the sorted items. Finally, the sorted items are added to the scene_list widget."""
+"""This code creates a new QListWidget object called my_list_widget, adds the items from my_item_list to it, sorts the items using sortItems(), and then replaces the items in my_item_list with the sorted items. Finally, the sorted items are added to the scene_list widget.
+
+Remember: self.scene_list === What is shown in the UI ::: Must overrwrite 
+the 'file' side of UpdateSceneList.
+"""

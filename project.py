@@ -111,13 +111,9 @@ class ProjectManager(QtWidgets.QWidget):
         set_proj_icon = QtGui.QIcon(set_proj_icon_path)
         self.set_proj.setIcon(set_proj_icon)
 
-        usd_label_icon_path = '/Users/stu/Downloads/image2vector(3).svg'
+        usd_label_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
         usd_label_icon = QtGui.QPixmap(usd_label_icon_path)
         self.usd_label.setPixmap(usd_label_icon)
-
-
-
-
 
         # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
@@ -334,7 +330,7 @@ class ProjectManager(QtWidgets.QWidget):
 
                 item = QtWidgets.QListWidgetItem(f"{file}")
                 item.setTextAlignment(QtCore.Qt.AlignLeft)
-
+                item.order = QtCore.Qt.DescendingOrder
 
                 item_widget = QtWidgets.QWidget()
 
@@ -346,7 +342,6 @@ class ProjectManager(QtWidgets.QWidget):
                 item_layout.setContentsMargins(0, 0, 0, 0)
                 item_layout.addWidget(item_label)
 
-                self.my_item_list.append(item)
                 self.non_usd_items.append((item, item_widget))
 
                 self.tree.add_path(path + '/')  # sequential paths added
@@ -473,35 +468,12 @@ class ProjectManager(QtWidgets.QWidget):
     def refresh_current_scene_list(self):
         self.update_scene_list()
 
-    def alpha_sort_button(self):
-        # for item, item_widget in self.non_usd_items:
-        #     self.scene_list.addItem(item)
-        #     self.scene_list.setItemWidget(item, item_widget)
-        #
-        # # Add the line separator
-        # if self.usd_items and self.non_usd_items:
-        #     self.scene_list.addItem(self.line_separator)
-        #
-        # non_usd = []
-        #
-        # for i in range(self.scene_list.count()):
-        #     item = self.scene_list.item(i)
-        #     if not item.text().endswith(('.usda', '.usdc')):
-        #         non_usd.append(item.text())
-        #
-        # for filename in non_usd:
-        #     item = QtWidgets.QListWidgetItem(filename)
-        #     self.scene_list.addItem(item)
-
-        my_list_widget = QtWidgets.QListWidget()
-        for item in self.my_item_list:
-            my_list_widget.addItem(item.text())
-
+    def alpha_sort_button(self, item):
         if self.current_order == Qt.AscendingOrder:
-            self.my_item_list.sortItems(Qt.DescendingOrder)
+            self.scene_list.sortItems(Qt.DescendingOrder)
             self.current_order = Qt.DescendingOrder
         else:
-            self.my_item_list.sortItems(Qt.AscendingOrder)
+            self.scene_list.sortItems(Qt.AscendingOrder)
             self.current_order = Qt.AscendingOrder
 
     def search_directories(self):
