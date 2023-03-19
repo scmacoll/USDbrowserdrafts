@@ -370,17 +370,18 @@ class ProjectManager(QtWidgets.QWidget):
             separator.setFlags(QtCore.Qt.NoItemFlags)
             separator.setSizeHint(QtCore.QSize(0, 20))
             separator.setBackground(
-                QtGui.QColor(128, 128,
-                             128))  # Set the background color to gray
+                QtGui.QColor(128, 128, 128))
 
             line = QtWidgets.QFrame()
             line.setFrameShape(QtWidgets.QFrame.HLine)
-            line.setFrameShadow(QtWidgets.QFrame.Sunken)
+            # line.setFrameShadow(QtWidgets.QFrame.Sunken)
             line.setLineWidth(1)
+            line.setContentsMargins(7, 0, 7, 0)
 
             # Set the background color of the separator
             palette = line.palette()
-            palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(128, 128, 128))
+            palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(
+                128, 128, 128))
             line.setPalette(palette)
 
             # Add the line widget to the separator list widget item
