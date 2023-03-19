@@ -277,9 +277,10 @@ class ProjectManager(QtWidgets.QWidget):
         items.sort()
 
         font = QtGui.QFont("Consolas", 12)
+        self.my_item_list = []
         max_usdc_width = 0
-        usd_items = []
-        non_usd_items = []
+        self.usd_items = []
+        self.non_usd_items = []
         for file in items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
@@ -334,6 +335,7 @@ class ProjectManager(QtWidgets.QWidget):
                 item = QtWidgets.QListWidgetItem(f"{file}")
                 item.setTextAlignment(QtCore.Qt.AlignLeft)
 
+
                 item_widget = QtWidgets.QWidget()
 
                 item_label = QtWidgets.QLabel(item_text)
@@ -344,7 +346,8 @@ class ProjectManager(QtWidgets.QWidget):
                 item_layout.setContentsMargins(0, 0, 0, 0)
                 item_layout.addWidget(item_label)
 
-                non_usd_items.append((item, item_widget))
+                self.my_item_list.append(item)
+                self.non_usd_items.append((item, item_widget))
 
                 self.tree.add_path(path + '/')  # sequential paths added
                 self.tree.node = self.current_node
@@ -356,7 +359,7 @@ class ProjectManager(QtWidgets.QWidget):
                 file.setForeground(QtGui.QColor('#1F8ECD'))
 
                 list_widget.addItem(file.text())
-                usd_items.append(file)
+                self.usd_items.append(file)
 
             elif file.endswith('.usdc'):
                 list_widget = QtWidgets.QListWidget()
@@ -364,15 +367,15 @@ class ProjectManager(QtWidgets.QWidget):
                 file.setForeground(QtGui.QColor('#5DAADA'))
 
                 list_widget.addItem(file.text())
-                usd_items.append(file)
+                self.usd_items.append(file)
 
         # Add the non-usd items first
-        for item, item_widget in non_usd_items:
+        for item, item_widget in self.non_usd_items:
             self.scene_list.addItem(item)
             self.scene_list.setItemWidget(item, item_widget)
 
         # Add a separator item
-        if usd_items and non_usd_items:
+        if self.usd_items and self.non_usd_items:
             separator = QtWidgets.QListWidgetItem()
             separator.setFlags(QtCore.Qt.NoItemFlags)
             separator.setSizeHint(QtCore.QSize(0, 20))
@@ -396,7 +399,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.scene_list.setItemWidget(separator, line)
 
         # Add usd items
-        for item in usd_items:
+        for item in self.usd_items:
             self.scene_list.addItem(item)
 
         return self.scene_list
@@ -471,11 +474,34 @@ class ProjectManager(QtWidgets.QWidget):
         self.update_scene_list()
 
     def alpha_sort_button(self):
+        # for item, item_widget in self.non_usd_items:
+        #     self.scene_list.addItem(item)
+        #     self.scene_list.setItemWidget(item, item_widget)
+        #
+        # # Add the line separator
+        # if self.usd_items and self.non_usd_items:
+        #     self.scene_list.addItem(self.line_separator)
+        #
+        # non_usd = []
+        #
+        # for i in range(self.scene_list.count()):
+        #     item = self.scene_list.item(i)
+        #     if not item.text().endswith(('.usda', '.usdc')):
+        #         non_usd.append(item.text())
+        #
+        # for filename in non_usd:
+        #     item = QtWidgets.QListWidgetItem(filename)
+        #     self.scene_list.addItem(item)
+
+        my_list_widget = QtWidgets.QListWidget()
+        for item in self.my_item_list:
+            my_list_widget.addItem(item.text())
+
         if self.current_order == Qt.AscendingOrder:
-            self.scene_list.sortItems(Qt.DescendingOrder)
+            self.my_item_list.sortItems(Qt.DescendingOrder)
             self.current_order = Qt.DescendingOrder
         else:
-            self.scene_list.sortItems(Qt.AscendingOrder)
+            self.my_item_list.sortItems(Qt.AscendingOrder)
             self.current_order = Qt.AscendingOrder
 
     def search_directories(self):
