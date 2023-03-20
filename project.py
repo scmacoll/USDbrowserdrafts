@@ -1,7 +1,7 @@
 import os
 import hou
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QLineEdit, QListWidgetItem
+from PySide2.QtWidgets import QLineEdit, QListWidgetItem, QHBoxLayout
 from PySide2.QtGui import QKeySequence, QBrush, QColor
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
@@ -278,19 +278,55 @@ class ProjectManager(QtWidgets.QWidget):
         items.sort()
 
         font = QtGui.QFont("Consolas", 12)
-        self.my_item_list = []
-        max_usdc_width = 0
         self.usd_items = []
         self.non_usd_items = []
+        max_usdc_width = 0
+        usda_file_count = 0
+        usdc_file_count = 0
+        usda_file_present = False
+        usdc_file_present = False
+
         for file in items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
-                usdc_file_count = 0
                 for root, dirs, files in os.walk(path):
                     for filename in files:
+                        if filename.endswith('.usda'):
+                            usda_file_count += 1
                         if filename.endswith('.usdc'):
                             usdc_file_count += 1
                 max_usdc_width = max(max_usdc_width, len(str(usdc_file_count)))
+
+        if usda_file_count > 0 or usdc_file_count > 0:
+            usda_file_present = usda_file_count > 0
+            usdc_file_present = usdc_file_count > 0
+
+        if usda_file_present and usdc_file_present:
+            self.usda_label.setVisible(True)
+            self.usdc_label.setVisible(True)
+            self.usda_label.setText("usda")
+            self.usda_label.setMinimumWidth(40)
+        elif not usda_file_present and not usdc_file_present:
+            self.usda_label.setVisible(False)
+            self.usdc_label.setVisible(False)
+            self.usda_label.setText("usda")
+            self.usda_label.setMinimumWidth(40)
+        elif usda_file_present and not usdc_file_present:
+            self.usda_label.setVisible(True)
+            self.usda_label.setText("      usda")
+            self.usda_label.setMinimumWidth(45)
+            # Adjust layout of labels
+            layout = QHBoxLayout()
+            layout.addWidget(self.usda_label)
+            layout.addStretch(1)  # Set stretch factor of usda label to 1
+            layout.addWidget(self.usdc_label)
+            self.setLayout(layout)
+            self.usdc_label.setVisible(False)
+        elif not usda_file_present and usdc_file_present:
+            self.usda_label.setVisible(False)
+            self.usdc_label.setVisible(True)
+            self.usda_label.setText("usda")
+            self.usda_label.setMinimumWidth(40)
 
         for file in items:
             path = os.path.join(self.current_node.path, file)
@@ -307,10 +343,7 @@ class ProjectManager(QtWidgets.QWidget):
                 str_length = len(str(usdc_file_count))
                 usdc_padding = '&nbsp;' * (max_usdc_width - str_length)
 
-
                 if usda_file_count == 0 and usdc_file_count == 0:
-                    self.usda_label.setVisible(False)
-                    self.usdc_label.setVisible(False)
                     usda_file_count = '&nbsp;' * 3
                     usdc_file_count = '&nbsp;' * 3
                     item_text = f"<font color='#1F8ECD'>" \
@@ -318,24 +351,18 @@ class ProjectManager(QtWidgets.QWidget):
                                 f"<font color='#5DAADA'>" \
                                 f"{usdc_file_count}</font> "
                 elif usda_file_count == 0:
-                    self.usda_label.setVisible(False)
-                    self.usdc_label.setVisible(True)
                     usda_file_count = '&nbsp;' * 3
                     item_text = f"<font color='#1F8ECD'>" \
                                 f"{usda_file_count}</font>{usdc_padding}  " \
                                 f"<font color='#5DAADA'>" \
                                 f"({usdc_file_count})</font> "
                 elif usdc_file_count == 0:
-                    self.usda_label.setVisible(True)
-                    self.usdc_label.setVisible(False)
                     usdc_file_count = '&nbsp;' * 3
                     item_text = f"<font color='#1F8ECD'>(" \
                                 f"{usda_file_count})</font>{usdc_padding}  " \
                                 f"<font color='#5DAADA'>" \
                                 f"{usdc_file_count}</font> "
                 else:
-                    self.usda_label.setVisible(True)
-                    self.usdc_label.setVisible(True)
                     item_text = f"<font color='#1F8ECD'>(" \
                                 f"{usda_file_count})</font>{usdc_padding}  " \
                                 f"<font color='#5DAADA'>" \
