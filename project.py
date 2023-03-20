@@ -264,8 +264,6 @@ class ProjectManager(QtWidgets.QWidget):
             self.ref_btn.setEnabled(True)
             self.home_btn.setEnabled(True)
 
-
-
         self.current_node.path = self.current_node.path + '/'
         if self.current_node.path[-2:] == '//':
             self.current_node.path = self.current_node.path[:-1]
@@ -274,8 +272,8 @@ class ProjectManager(QtWidgets.QWidget):
         # print("node path:    " + self.current_node.path)
         # print("node children []:    " + str(self.current_node.children))
 
+        sorted_items = []
         items = os.listdir(self.current_node.path)
-        items.sort()
 
         font = QtGui.QFont("Consolas", 12)
         self.usd_items = []
@@ -286,17 +284,21 @@ class ProjectManager(QtWidgets.QWidget):
         usda_file_present = False
         usdc_file_present = False
 
+        # grab total values of current node
         for file in items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
-                for root, dirs, files in os.walk(path):
-                    for filename in files:
-                        if filename.endswith('.usda'):
-                            usda_file_count += 1
-                        if filename.endswith('.usdc'):
-                            usdc_file_count += 1
-                max_usdc_width = max(max_usdc_width, len(str(usdc_file_count)))
+                sorted_items.append(file)
+                sorted_items.sort()
+            for root, dirs, files in os.walk(path):
+                for filename in files:
+                    if filename.endswith('.usda'):
+                        usda_file_count += 1
+                    if filename.endswith('.usdc'):
+                        usdc_file_count += 1
+            max_usdc_width = max(max_usdc_width, len(str(usdc_file_count)))
 
+        # Set visibility & width of usda/usdc labels
         if usda_file_count > 0 or usdc_file_count > 0:
             usda_file_present = usda_file_count > 0
             usdc_file_present = usdc_file_count > 0
@@ -315,7 +317,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.usda_label.setVisible(True)
             self.usda_label.setText("      usda")
             self.usda_label.setMinimumWidth(45)
-            # Adjust layout of labels
+            # Adjust layout of usda label
             layout = QHBoxLayout()
             layout.addWidget(self.usda_label)
             layout.addStretch(1)  # Set stretch factor of usda label to 1
@@ -328,9 +330,36 @@ class ProjectManager(QtWidgets.QWidget):
             self.usda_label.setText("usda")
             self.usda_label.setMinimumWidth(40)
 
+        # print("items before sorting:    ", items)
+        #
+        # # Create a list of selected items that don't end with .usda or .usdc
+        # sorted_items = [item for item in items if not item.endswith('.usda') and not item.endswith('.usdc')]
+        #
+        # # Sort the selected items
+        # sorted_items.sort()
+        #
+        # # Replace duplicates in the original list with items from the sorted list
+        # sorted_items_index = 0
+        # for i in range(len(items)):
+        #     if items[i] in sorted_items:
+        #         items[i] = sorted_items[sorted_items_index]
+        #         sorted_items_index += 1
+        #
+
+        sorted_items.sort()
+        sorted_items_index = 0
+        for i in range(len(items)):
+            if items[i] in sorted_items:
+                items[i] = sorted_items[sorted_items_index]
+                sorted_items_index += 1
+        # ! Sort function will go around here
+        print("items after sorting:    ", items)
+
+
+        # get all usd files in current node & subdirs
         for file in items:
             path = os.path.join(self.current_node.path, file)
-            if os.path.isdir(path):
+            if os.path.isdir(path):  # if item is a directory
                 usda_file_count = 0
                 usdc_file_count = 0
                 for root, dirs, files in os.walk(path):
@@ -508,13 +537,37 @@ class ProjectManager(QtWidgets.QWidget):
     def refresh_current_scene_list(self):
         self.update_scene_list()
 
-    def alpha_sort_button(self, item):
-        if self.current_order == Qt.AscendingOrder:
-            self.scene_list.sortItems(Qt.DescendingOrder)
-            self.current_order = Qt.DescendingOrder
-        else:
-            self.scene_list.sortItems(Qt.AscendingOrder)
-            self.current_order = Qt.AscendingOrder
+    def alpha_sort_button(self, items):
+        print("alpha_sort_button called!")
+        # print("alpha_sort_button called with alpha_sort =",
+        #       self.alpha_sort_button)
+        # print("alpha_sort checkbox state before sorting:", self.alpha_sort.isChecked())
+        # if not items:
+        #     return items
+        # if not any(file.endswith(('.usda', '.usdc')) for file in items):
+        #     if self.alpha_sort.isChecked():
+        #         items.sort()
+        #     else:
+        #         items.sort(reverse=True)
+        # else:
+        #     usd_items = [file for file in items if file.endswith(('.usda', '.usdc'))]
+        #     non_usd_items = [file for file in items if not file.endswith(('.usda', '.usdc'))]
+        #     if self.alpha_sort.isChecked():
+        #         usd_items.sort()
+        #         non_usd_items.sort()
+        #     else:
+        #         usd_items.sort(reverse=True)
+        #         non_usd_items.sort(reverse=True)
+        #     items = non_usd_items + usd_items
+        # print("alpha_sort checkbox state after sorting:", self.alpha_sort.isChecked())
+        # return items
+
+    # if self.current_order == Qt.AscendingOrder:
+        #     self.scene_list.sortItems(Qt.DescendingOrder)
+        #     self.current_order = Qt.DescendingOrder
+        # else:
+        #     self.scene_list.sortItems(Qt.AscendingOrder)
+        #     self.current_order = Qt.AscendingOrder
 
     def search_directories(self):
         query = self.search_bar.text()
