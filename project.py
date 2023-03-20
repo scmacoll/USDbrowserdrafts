@@ -136,6 +136,8 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.setLayout(main_layout)
 
+        self.ascending_order = False
+
         self.search_bar.setEnabled(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
@@ -346,7 +348,13 @@ class ProjectManager(QtWidgets.QWidget):
         #         sorted_items_index += 1
         #
 
-        sorted_items.sort()
+        if not self.ascending_order:
+            self.ascending_order = True
+            sorted_items.sort()
+        elif self.ascending_order:
+            self.ascending_order = False
+            sorted_items.sort(reverse=True)
+
         sorted_items_index = 0
         for i in range(len(items)):
             if items[i] in sorted_items:
