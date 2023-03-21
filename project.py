@@ -72,6 +72,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
         self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
         self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
+        self.cmt_label = self.ui.findChild(QtWidgets.QLabel, 'cmtlbl')
         self.usd_label = self.ui.findChild(QtWidgets.QLabel, 'usdlabel')
         self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
         self.search_bar = self.ui.findChild(QtWidgets.QLineEdit, 'searchbar')
@@ -84,7 +85,6 @@ class ProjectManager(QtWidgets.QWidget):
 
         # self.current_order = Qt.AscendingOrder
 
-        # create connections (/button functionality)
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
@@ -100,31 +100,25 @@ class ProjectManager(QtWidgets.QWidget):
                          '/back.svg'
         back_icon = QtGui.QIcon(back_icon_path)
         self.back_btn.setIcon(back_icon)
-
         fwd_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                         '/forward.svg'
         fwd_icon = QtGui.QIcon(fwd_icon_path)
         self.fwd_btn.setIcon(fwd_icon)
-
         ref_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                         '/reload.svg'
         ref_icon = QtGui.QIcon(ref_icon_path)
         self.ref_btn.setIcon(ref_icon)
-
         home_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
                          '/home.svg'
         home_icon = QtGui.QIcon(home_icon_path)
         self.home_btn.setIcon(home_icon)
-
         alpha_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
                           '/adaptpixelrange.svg'
         alpha_icon = QtGui.QIcon(alpha_icon_path)
         self.alpha_sort.setIcon(alpha_icon)
-
         set_proj_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder.svg'
         set_proj_icon = QtGui.QIcon(set_proj_icon_path)
         self.set_proj.setIcon(set_proj_icon)
-
         usd_label_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
         usd_label_icon = QtGui.QPixmap(usd_label_icon_path)
         self.usd_label.setPixmap(usd_label_icon)
@@ -146,11 +140,8 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
 
-        # Create layout (how widgets will be organised)
-        main_layout = QtWidgets.QVBoxLayout()  # vertical layout
-
+        main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(self.ui)
-
         self.setLayout(main_layout)
 
         # reload current python panel interface
@@ -540,8 +531,14 @@ class ProjectManager(QtWidgets.QWidget):
                 return
 
     def refresh_current_scene_list(self):
-        print("<<<    refresh button pressed! :D alpha clicked?   >>>",
-              self.alpha_sort_clicked)
+        # set font for color refresh_cmt
+        font = QtGui.QFont("TerminessTTF Nerd Font Mono", 12, QtGui.QFont.Bold)
+        refresh_cmt = "  refreshed directory!"
+        self.cmt_label.setFont(font)
+        self.cmt_label.setText(refresh_cmt)
+        palette = self.cmt_label.palette()
+        palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
+        self.cmt_label.setPalette(palette)
         self.ascending_order = True
         self.alpha_sort_clicked = False
         self.update_scene_list()
