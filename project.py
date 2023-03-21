@@ -82,7 +82,19 @@ class ProjectManager(QtWidgets.QWidget):
         self.default_proj_path = self.proj_path.text()
         self.default_job_path = self.job_path.text()
 
-        self.current_order = Qt.AscendingOrder
+        # self.current_order = Qt.AscendingOrder
+
+        # create connections (/button functionality)
+        self.set_proj.clicked.connect(self.set_project)
+        self.back_btn.clicked.connect(self.back_button)
+        self.fwd_btn.clicked.connect(self.forward_button)
+        self.alpha_sort.clicked.connect(self.alpha_sort_button)
+        self.fwd_btn.clicked.connect(self.redo_click_forward)
+        self.ref_btn.clicked.connect(self.refresh_current_scene_list)
+        self.home_btn.clicked.connect(self.go_to_job_dir)
+        self.reset_btn.clicked.connect(self.reset_button)
+        self.scene_list.doubleClicked.connect(self.double_click_forward)
+        self.search_bar.textChanged.connect(self.search_directories)
 
         back_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                          '/back.svg'
@@ -117,26 +129,8 @@ class ProjectManager(QtWidgets.QWidget):
         usd_label_icon = QtGui.QPixmap(usd_label_icon_path)
         self.usd_label.setPixmap(usd_label_icon)
 
-        # create connections (/button functionality)
-        self.set_proj.clicked.connect(self.set_project)
-        self.back_btn.clicked.connect(self.back_button)
-        self.fwd_btn.clicked.connect(self.forward_button)
-        self.alpha_sort.clicked.connect(self.alpha_sort_button)
-        self.fwd_btn.clicked.connect(self.redo_click_forward)
-        self.ref_btn.clicked.connect(self.refresh_current_scene_list)
-        self.home_btn.clicked.connect(self.go_to_job_dir)
-        self.reset_btn.clicked.connect(self.reset_button)
-        self.scene_list.doubleClicked.connect(self.double_click_forward)
-        self.search_bar.textChanged.connect(self.search_directories)
-
-        # Create layout (how widgets will be organised)
-        main_layout = QtWidgets.QVBoxLayout()  # vertical layout
-
-        main_layout.addWidget(self.ui)
-
-        self.setLayout(main_layout)
-
-        self.ascending_order = False
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
 
         self.search_bar.setEnabled(False)
         self.back_btn.setEnabled(False)
@@ -152,8 +146,14 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
 
-        # reload current python panel interface
+        # Create layout (how widgets will be organised)
+        main_layout = QtWidgets.QVBoxLayout()  # vertical layout
 
+        main_layout.addWidget(self.ui)
+
+        self.setLayout(main_layout)
+
+        # reload current python panel interface
     def reset_button(self):
         self.tree = Tree()
         self.current_node = self.tree.root
@@ -255,6 +255,18 @@ class ProjectManager(QtWidgets.QWidget):
         self.current_node.path = self.proj
         self.update_scene_list()
 
+    def alpha_sort_button(self):
+        self.alpha_sort_clicked = True
+        self.update_scene_list()
+
+    def sort_items_alpha(self):
+        if not self.ascending_order:
+            self.ascending_order = True
+            self.sorted_items.sort()
+        elif self.ascending_order:
+            self.ascending_order = False
+            self.sorted_items.sort(reverse=True)
+
     def update_scene_list(self):
         self.scene_list.clear()
         self.current_node.subdirs_present = False
@@ -274,12 +286,13 @@ class ProjectManager(QtWidgets.QWidget):
         # print("node path:    " + self.current_node.path)
         # print("node children []:    " + str(self.current_node.children))
 
-        sorted_items = []
         items = os.listdir(self.current_node.path)
-
-        font = QtGui.QFont("Consolas", 12)
+        self.items = items
+        self.sorted_items = []
         self.usd_items = []
         self.non_usd_items = []
+
+        font = QtGui.QFont("Consolas", 12)
         max_usdc_width = 0
         usda_file_count = 0
         usdc_file_count = 0
@@ -287,11 +300,10 @@ class ProjectManager(QtWidgets.QWidget):
         usdc_file_present = False
 
         # grab total values of current node
-        for file in items:
+        for file in self.items:
             path = os.path.join(self.current_node.path, file)
             if os.path.isdir(path):
-                sorted_items.append(file)
-                sorted_items.sort()
+                self.sorted_items.append(file)
             for root, dirs, files in os.walk(path):
                 for filename in files:
                     if filename.endswith('.usda'):
@@ -332,37 +344,17 @@ class ProjectManager(QtWidgets.QWidget):
             self.usda_label.setText("usda")
             self.usda_label.setMinimumWidth(40)
 
-        # print("items before sorting:    ", items)
-        #
-        # # Create a list of selected items that don't end with .usda or .usdc
-        # sorted_items = [item for item in items if not item.endswith('.usda') and not item.endswith('.usdc')]
-        #
-        # # Sort the selected items
-        # sorted_items.sort()
-        #
-        # # Replace duplicates in the original list with items from the sorted list
-        # sorted_items_index = 0
-        # for i in range(len(items)):
-        #     if items[i] in sorted_items:
-        #         items[i] = sorted_items[sorted_items_index]
-        #         sorted_items_index += 1
-        #
+        self.sorted_items.sort()
 
-        if not self.ascending_order:
-            self.ascending_order = True
-            sorted_items.sort()
-        elif self.ascending_order:
-            self.ascending_order = False
-            sorted_items.sort(reverse=True)
+        if self.alpha_sort_clicked:
+            self.sort_items_alpha()
 
-        sorted_items_index = 0
-        for i in range(len(items)):
-            if items[i] in sorted_items:
-                items[i] = sorted_items[sorted_items_index]
-                sorted_items_index += 1
-        # ! Sort function will go around here
-        print("items after sorting:    ", items)
-
+        # Replace duplicates in the original list with items from the sorted list
+        self.sorted_items_index = 0
+        for i in range(len(self.items)):
+            if self.items[i] in self.sorted_items:
+                self.items[i] = self.sorted_items[self.sorted_items_index]
+                self.sorted_items_index += 1
 
         # get all usd files in current node & subdirs
         for file in items:
@@ -406,8 +398,8 @@ class ProjectManager(QtWidgets.QWidget):
                                 f"({usdc_file_count})</font> "
 
                 item = QtWidgets.QListWidgetItem(f"{file}")
-                item.setTextAlignment(QtCore.Qt.AlignLeft)
-                item.order = QtCore.Qt.DescendingOrder
+                # item.setTextAlignment(QtCore.Qt.AlignLeft)
+                # item.order = QtCore.Qt.DescendingOrder
 
                 item_widget = QtWidgets.QWidget()
 
@@ -491,7 +483,10 @@ class ProjectManager(QtWidgets.QWidget):
             self.current_node.path = os.path.dirname(
                 os.path.dirname(self.current_node.path))
             print("going back to:    " + self.current_node.path)
-            self.update_scene_list()
+
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
+        self.update_scene_list()
 
     def forward_button(self):
         selected_item = self.scene_list.currentItem()
@@ -543,39 +538,11 @@ class ProjectManager(QtWidgets.QWidget):
                 return
 
     def refresh_current_scene_list(self):
+        print("<<<    refresh button pressed! :D alpha clicked?   >>>",
+              self.alpha_sort_clicked)
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
         self.update_scene_list()
-
-    def alpha_sort_button(self, items):
-        print("alpha_sort_button called!")
-        # print("alpha_sort_button called with alpha_sort =",
-        #       self.alpha_sort_button)
-        # print("alpha_sort checkbox state before sorting:", self.alpha_sort.isChecked())
-        # if not items:
-        #     return items
-        # if not any(file.endswith(('.usda', '.usdc')) for file in items):
-        #     if self.alpha_sort.isChecked():
-        #         items.sort()
-        #     else:
-        #         items.sort(reverse=True)
-        # else:
-        #     usd_items = [file for file in items if file.endswith(('.usda', '.usdc'))]
-        #     non_usd_items = [file for file in items if not file.endswith(('.usda', '.usdc'))]
-        #     if self.alpha_sort.isChecked():
-        #         usd_items.sort()
-        #         non_usd_items.sort()
-        #     else:
-        #         usd_items.sort(reverse=True)
-        #         non_usd_items.sort(reverse=True)
-        #     items = non_usd_items + usd_items
-        # print("alpha_sort checkbox state after sorting:", self.alpha_sort.isChecked())
-        # return items
-
-    # if self.current_order == Qt.AscendingOrder:
-        #     self.scene_list.sortItems(Qt.DescendingOrder)
-        #     self.current_order = Qt.DescendingOrder
-        # else:
-        #     self.scene_list.sortItems(Qt.AscendingOrder)
-        #     self.current_order = Qt.AscendingOrder
 
     def search_directories(self):
         query = self.search_bar.text()

@@ -231,3 +231,75 @@ Alternatively, if you want to sort the items in my_item_list, you could convert 
 Remember: self.scene_list === What is shown in the UI ::: Must overrwrite 
 the 'file' side of UpdateSceneList.
 """
+
+
+
+def update_scene_list(self, alpha_sort_items, alpha_sort_index):
+
+    self.sorted_items = []
+    items = os.listdir(self.current_node.path)
+    self.items = items
+
+    self.usd_items = []
+    self.non_usd_items = []
+
+    # grab total values of current node
+    for file in self.items:
+        path = os.path.join(self.current_node.path, file)
+        if os.path.isdir(path):
+            self.sorted_items.append(file)
+            self.sorted_items.sort()
+
+    if not self.ascending_order:
+        self.ascending_order = True
+        self.sorted_items.sort()
+    # elif self.ascending_order:
+    #     self.ascending_order = False
+    #     self.sorted_items.sort(reverse=True)
+
+    # Replace duplicates in the original list with items from the sorted list
+    self.sorted_items_index = 0
+    for i in range(len(self.items)):
+        if self.items[i] in self.sorted_items:
+            self.items[i] = self.sorted_items[self.sorted_items_index]
+            self.sorted_items_index += 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
