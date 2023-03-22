@@ -170,17 +170,23 @@ class ProjectManager(QtWidgets.QWidget):
         super(ProjectManager, self).mousePressEvent(event)
 
     def keyPressEvent(self, event):
+
         if event.key() == QtCore.Qt.Key_Escape:
-            if self.search_bar.hasFocus():
+            print("escape KEY pressed")
+            if self.search_bar.hasFocus() and \
+                    self.search_bar.text() == '':
+                print("4th if escape pressed")
                 self.search_bar.clearFocus()
+            elif self.search_bar.hasFocus():
+                print("1st if escape pressed")
+                self.search_bar.clear()
             elif self.enter_pressed_on_search_bar:
+                print("2nd if escape pressed")
                 self.scene_list.clearSelection()
                 self.search_bar.setFocus()
-            elif self.scene_list.hasSelection():
-                # ? need to fix
+            elif self.scene_list.hasFocus():
+                print("3rd if escape pressed")
                 self.scene_list.clearSelection()
-            else:
-                self.search_bar.clear()
 
             super(ProjectManager, self).keyPressEvent(event)
 
