@@ -1,5 +1,6 @@
 import os
 import hou
+from pathlib import Path
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QLineEdit, QListWidgetItem, QHBoxLayout
 from PySide2.QtGui import QKeySequence, QBrush, QColor
@@ -241,20 +242,30 @@ class ProjectManager(QtWidgets.QWidget):
 
         proj_name = '  USD Project:  ' + set_job.split('/')[-2]
         set_job = 'JOB:  ' + os.path.dirname(set_job)
-        proj_path = 'Path:  ' + set_job
+        # proj_path = 'Path:  ' + set_job
         self.proj_name.setText(proj_name)
-        self.job_path.setText(set_job)
-        self.proj_path.setText(proj_path)
+        self.job_path.setText(set_job + '/')
+        # self.proj_path.setText(proj_path)
+        # self.proj_path.setText('Path:  ' + self.current_node.path)
+
+        self.base = os.path.basename(self.current_node.path.rstrip('/'))
+        self.base_path = self.base + '/'
+
+        self.rel_path = os.path.relpath(
+            self.current_node.path, self.proj).split(os.path.sep)[1:]
 
         #  Create a Node Instance
         self.current_node = self.tree.root
         self.update_scene_list()
+        self.comment_text(comment="")
 
     def go_to_job_dir(self):
         self.current_node.path = self.proj
         self.ascending_order = True
         self.alpha_sort_clicked = False
         self.update_scene_list()
+        comment = "  returned to JOB!"
+        self.comment_text(comment)
 
     def alpha_sort_button(self):
         self.alpha_sort_clicked = True
@@ -264,17 +275,32 @@ class ProjectManager(QtWidgets.QWidget):
         if not self.ascending_order:
             self.ascending_order = True
             self.sorted_items.sort()
+            self.comment_text(comment="")
         elif self.ascending_order:
             self.ascending_order = False
             self.sorted_items.sort(reverse=True)
+            self.comment_text(comment="")
 
     def update_scene_list(self):
         self.scene_list.clear()
         self.current_node.subdirs_present = False
+
+        normalized_path = Path(str(self.current_node.path)).resolve()
+        path_parts = normalized_path.parts
+        try:
+            base_idx = path_parts.index(self.base)
+        except ValueError:
+            raise ValueError(f"{self.base} not found in "
+                             f"{str(self.current_node.path)}")
+        selected_path_parts = path_parts[base_idx:]
+        resulting_path = Path(*selected_path_parts)
+        self.proj_path.setText('Path:  ' + str(resulting_path) + '/')
+
+
         if self.proj:
-            self.search_bar.setEnabled(True)
             self.back_btn.setEnabled(True)
             self.fwd_btn.setEnabled(True)
+            self.search_bar.setEnabled(True)
             self.alpha_sort.setEnabled(True)
             self.ref_btn.setEnabled(True)
             self.home_btn.setEnabled(True)
@@ -470,20 +496,23 @@ class ProjectManager(QtWidgets.QWidget):
         return self.scene_list
 
     def back_button(self):
-        print(len(self.back_stack))
-        print("<<<    back button pressed! :D    >>>")
+        # print(len(self.back_stack))
+        # print("<<<    back button pressed! :D    >>>")
         home_dir = os.path.expanduser("~")
         job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME',
                                                                    home_dir)
 
         if os.path.abspath(self.current_node.path) == job_path:
-            print("Can't go back any further on the $JOB PATH")
+            comment = "  can't go back on JOB!"
+            self.comment_text(comment)
+            # print("Can't go back any further on the $JOB PATH")
             return
         else:
             self.back_stack.append(self.current_node.path)
             self.current_node.path = os.path.dirname(
                 os.path.dirname(self.current_node.path))
-            print("going back to:    " + self.current_node.path)
+            self.comment_text(comment="")
+            # print("going back to:    " + self.current_node.path)
 
         self.ascending_order = True
         self.alpha_sort_clicked = False
@@ -497,6 +526,7 @@ class ProjectManager(QtWidgets.QWidget):
             selected_path = os.path.join(self.current_node.path,
                                          selected_item.text())
             self.back_stack.clear()
+            self.comment_text(comment="")
             for child in self.current_node.children:
                 if child.path == selected_path:
                     self.current_node = child
@@ -504,15 +534,14 @@ class ProjectManager(QtWidgets.QWidget):
                     break
         elif selected_item is not None and selected_item.text(
         ).endswith(('.usda', '.usdc')):
-            print("you have selected a .USD file")
+            # print("you have selected a .USD file")
             return
         else:
+            self.comment_text(comment="")
             return
 
         self.current_node.path = os.path.join(
             self.current_node.path + selected_item.text())
-
-        print("<<<    forward button pressed! :D    >>>")
         self.update_scene_list()
 
     def double_click_forward(self):
@@ -521,35 +550,43 @@ class ProjectManager(QtWidgets.QWidget):
 
     def redo_click_forward(self):
         selected_item = self.scene_list.currentItem()
-        print("<<<    redo click forward button pressed! :D    >>>")
-        print("stack length:    " + str(len(self.back_stack)))
+        # print("<<<    redo click forward button pressed! :D    >>>")
+        # print("stack length:    " + str(len(self.back_stack)))
 
         if selected_item is None:
             if len(self.back_stack) >= 1 and self.current_node.subdirs_present:
                 node = self.back_stack.pop()
                 self.current_node.path = node
                 self.update_scene_list()
-                print("stack length:    " + str(len(self.back_stack)))
+                self.comment_text(comment="")
+                # print("stack length:    " + str(len(self.back_stack)))
             elif len(self.back_stack) <= 0 and \
                     self.current_node.subdirs_present:
-                print("    No more redos!    ")
+                comment = "  select file to navigate!"
+                self.comment_text(comment)
                 return
             else:
-                print("    Can't go back any further!    ")
+                comment = "  no more subdirectories!"
+                self.comment_text(comment)
                 return
 
     def refresh_current_scene_list(self):
         # set font for color refresh_cmt
-        font = QtGui.QFont("TerminessTTF Nerd Font Mono", 12, QtGui.QFont.Bold)
-        refresh_cmt = "  refreshed directory!"
-        self.cmt_label.setFont(font)
-        self.cmt_label.setText(refresh_cmt)
-        palette = self.cmt_label.palette()
-        palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
-        self.cmt_label.setPalette(palette)
+        self.back_stack.clear()
+        comment = "  refreshed directory!"
+        self.comment_text(comment)
         self.ascending_order = True
         self.alpha_sort_clicked = False
         self.update_scene_list()
+
+    def comment_text(self, comment):
+        font = QtGui.QFont("TerminessTTF Nerd Font Mono", 12, QtGui.QFont.Bold)
+        self.cmt_label.setFont(font)
+        self.cmt_label.setText(comment)
+        palette = self.cmt_label.palette()
+        palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
+        self.cmt_label.setPalette(palette)
+
 
     def search_directories(self):
         query = self.search_bar.text()
