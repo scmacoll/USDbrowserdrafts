@@ -176,9 +176,11 @@ class ProjectManager(QtWidgets.QWidget):
             elif self.enter_pressed_on_search_bar:
                 self.scene_list.clearSelection()
                 self.search_bar.setFocus()
-            else:
-                # self.scene_list.clearFocus()  # ? need to fix
+            elif self.scene_list.hasSelection():
+                # ? need to fix
                 self.scene_list.clearSelection()
+            else:
+                self.search_bar.clear()
 
             super(ProjectManager, self).keyPressEvent(event)
 
