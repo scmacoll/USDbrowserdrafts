@@ -402,6 +402,7 @@
          <property name="font">
           <font>
            <pointsize>15</pointsize>
+           <bold>true</bold>
           </font>
          </property>
          <property name="text">

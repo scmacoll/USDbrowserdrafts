@@ -245,31 +245,18 @@ class ProjectManager(QtWidgets.QWidget):
         self.tree.add_path(self.proj)  # add path to tree node
 
         proj_name = '  USD Project:  ' + set_job.split('/')[-2]
-        set_job = 'JOB:  ' + os.path.dirname(set_job)
+
+        dir_name, base_name = os.path.split(set_job)
+        before_dir_name, last_path_name = os.path.split(dir_name)
+
+        job_label = 'JOB:  ' + before_dir_name + '/' + '<b>' + \
+                    last_path_name + '</b>'
+
+        # set_job = 'JOB:  ' + os.path.dirname(set_job)
+
         self.proj_name.setText(proj_name)
-        self.job_path.setText(set_job + '/')
-
-        self.base = os.path.basename(self.current_node.path.rstrip('/'))
-        self.base_path = self.base + '/'
-
-        #  Create a Node Instance
-        self.current_node = self.tree.root
-        self.update_scene_list()
-        self.comment_text(comment="")
-
-    def set_project_manual(self, path):
-        set_job = path
-        hou.hscript('setenv JOB=' + set_job)
-        self.proj = path
-
-        self.tree = Tree(self.proj)
-        self.current_node = self.tree.root  # create a new node
-        self.tree.add_path(self.proj)  # add path to tree node
-
-        proj_name = '  USD Project:  ' + set_job.split('/')[-2]
-        set_job = 'JOB:  ' + os.path.dirname(set_job)
-        self.proj_name.setText(proj_name)
-        self.job_path.setText(set_job + '/')
+        # self.job_path.setText(set_job + '/')
+        self.job_path.setText(job_label)
 
         self.base = os.path.basename(self.current_node.path.rstrip('/'))
         self.base_path = self.base + '/'
@@ -314,7 +301,10 @@ class ProjectManager(QtWidgets.QWidget):
                              f"{str(self.current_node.path)}")
         selected_path_parts = path_parts[base_idx:]
         resulting_path = Path(*selected_path_parts)
-        self.proj_path.setText('Path:  ' + str(resulting_path) + '/')
+        first_part = f"<b>{resulting_path.parts[0]}</b>"
+        rest_parts = resulting_path.parts[1:]
+        formatted_path = Path(first_part, *rest_parts)
+        self.proj_path.setText('Path:  ' + str(formatted_path) + '/')
 
         if self.proj:
             self.back_btn.setEnabled(True)
