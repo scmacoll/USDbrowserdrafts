@@ -469,10 +469,48 @@
        </item>
        <item>
         <widget class="QPushButton" name="resetbtn">
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>55</red>
+               <green>55</green>
+               <blue>55</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>50</red>
+               <green>50</green>
+               <blue>50</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>55</red>
+               <green>55</green>
+               <blue>55</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
          <property name="styleSheet">
-          <string notr="true">QLabel {
-    color: #1F8ECD;
-}</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Reset</string>

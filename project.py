@@ -1,9 +1,10 @@
 import os
+
 import hou
 from pathlib import Path
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QLineEdit, QListWidgetItem, QHBoxLayout
-from PySide2.QtGui import QKeySequence, QBrush, QColor
+from PySide2.QtGui import QKeySequence, QBrush, QColor, QPalette
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
 
@@ -117,7 +118,9 @@ class ProjectManager(QtWidgets.QWidget):
                           '/adaptpixelrange.svg'
         alpha_icon = QtGui.QIcon(alpha_icon_path)
         self.alpha_sort.setIcon(alpha_icon)
-        set_proj_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder.svg'
+        set_proj_icon_path = \
+            '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder' \
+            '.svg'
         set_proj_icon = QtGui.QIcon(set_proj_icon_path)
         self.set_proj.setIcon(set_proj_icon)
         usd_label_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
@@ -146,6 +149,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.setLayout(main_layout)
 
         # reload current python panel interface
+
     def reset_button(self):
         self.tree = Tree()
         self.current_node = self.tree.root
@@ -242,17 +246,33 @@ class ProjectManager(QtWidgets.QWidget):
 
         proj_name = '  USD Project:  ' + set_job.split('/')[-2]
         set_job = 'JOB:  ' + os.path.dirname(set_job)
-        # proj_path = 'Path:  ' + set_job
         self.proj_name.setText(proj_name)
         self.job_path.setText(set_job + '/')
-        # self.proj_path.setText(proj_path)
-        # self.proj_path.setText('Path:  ' + self.current_node.path)
 
         self.base = os.path.basename(self.current_node.path.rstrip('/'))
         self.base_path = self.base + '/'
 
-        self.rel_path = os.path.relpath(
-            self.current_node.path, self.proj).split(os.path.sep)[1:]
+        #  Create a Node Instance
+        self.current_node = self.tree.root
+        self.update_scene_list()
+        self.comment_text(comment="")
+
+    def set_project_manual(self, path):
+        set_job = path
+        hou.hscript('setenv JOB=' + set_job)
+        self.proj = path
+
+        self.tree = Tree(self.proj)
+        self.current_node = self.tree.root  # create a new node
+        self.tree.add_path(self.proj)  # add path to tree node
+
+        proj_name = '  USD Project:  ' + set_job.split('/')[-2]
+        set_job = 'JOB:  ' + os.path.dirname(set_job)
+        self.proj_name.setText(proj_name)
+        self.job_path.setText(set_job + '/')
+
+        self.base = os.path.basename(self.current_node.path.rstrip('/'))
+        self.base_path = self.base + '/'
 
         #  Create a Node Instance
         self.current_node = self.tree.root
@@ -295,7 +315,6 @@ class ProjectManager(QtWidgets.QWidget):
         selected_path_parts = path_parts[base_idx:]
         resulting_path = Path(*selected_path_parts)
         self.proj_path.setText('Path:  ' + str(resulting_path) + '/')
-
 
         if self.proj:
             self.back_btn.setEnabled(True)
@@ -376,7 +395,8 @@ class ProjectManager(QtWidgets.QWidget):
         if self.alpha_sort_clicked:
             self.sort_items_alpha()
 
-        # Replace duplicates in the original list with items from the sorted list
+        # Replace duplicates in the original list with items from the sorted
+        # list
         self.sorted_items_index = 0
         for i in range(len(self.items)):
             if self.items[i] in self.sorted_items:
@@ -586,7 +606,6 @@ class ProjectManager(QtWidgets.QWidget):
         palette = self.cmt_label.palette()
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
         self.cmt_label.setPalette(palette)
-
 
     def search_directories(self):
         query = self.search_bar.text()
