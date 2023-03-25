@@ -3,7 +3,8 @@ import os
 import hou
 from pathlib import Path
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QLineEdit, QListWidgetItem, QHBoxLayout
+from PySide2.QtWidgets import QLineEdit, QListWidgetItem, QHBoxLayout, \
+    QMessageBox, QCheckBox
 from PySide2.QtGui import QKeySequence, QBrush, QColor, QPalette
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
@@ -140,9 +141,12 @@ class ProjectManager(QtWidgets.QWidget):
         self.usda_label.setVisible(False)
         self.usdc_label.setVisible(False)
 
+        self.show_reset_popup = True
+
         self.enter_pressed_on_search_bar = False
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
+
 
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(self.ui)
@@ -151,6 +155,29 @@ class ProjectManager(QtWidgets.QWidget):
         # reload current python panel interface
 
     def reset_button(self):
+        if self.show_reset_popup:
+            msg_box = QMessageBox()
+            msg_box.setWindowTitle('Reset')
+            msg_box.setText('Are you sure you want to reset?')
+            msg_box.setIcon(QMessageBox.Warning)
+            msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            msg_box.setDefaultButton(QMessageBox.No)
+
+            dont_show_reset = QCheckBox("Don't ask again", msg_box)
+            msg_box.setCheckBox(dont_show_reset)
+
+            reply = msg_box.exec_()
+
+            if reply == QMessageBox.Yes:
+                self.reset_project()
+
+            if dont_show_reset.isChecked():
+                self.show_reset_popup = False
+
+        else:
+            self.reset_project()
+
+    def reset_project(self):
         self.tree = Tree()
         self.current_node = self.tree.root
         self.back_stack.clear()
