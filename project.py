@@ -91,8 +91,8 @@ class ProjectManager(QtWidgets.QWidget):
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
-        self.alpha_sort.clicked.connect(self.alpha_sort_button)
         self.fwd_btn.clicked.connect(self.redo_click_forward)
+        self.alpha_sort.clicked.connect(self.alpha_sort_button)
         self.ref_btn.clicked.connect(self.refresh_current_scene_list)
         self.home_btn.clicked.connect(self.go_to_job_dir)
         self.reset_btn.clicked.connect(self.reset_button)
@@ -538,6 +538,8 @@ class ProjectManager(QtWidgets.QWidget):
         for item in self.usd_items:
             self.scene_list.addItem(item)
 
+        print(len(self.back_stack))
+
         return self.scene_list
 
     def back_button(self):
@@ -563,6 +565,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.update_scene_list()
 
     def forward_button(self):
+        print("forward button clicked")
         selected_item = self.scene_list.currentItem()
 
         if selected_item is not None and os.path.isdir(os.path.join(
@@ -588,11 +591,14 @@ class ProjectManager(QtWidgets.QWidget):
             self.current_node.path + selected_item.text())
         self.update_scene_list()
 
+        self.comment_text(comment="")
+
     def double_click_forward(self):
         self.back_stack.clear()
         self.forward_button()
 
     def redo_click_forward(self):
+        print("redo click forward button pressed! :D")
         selected_item = self.scene_list.currentItem()
         # print("<<<    redo click forward button pressed! :D    >>>")
         # print("stack length:    " + str(len(self.back_stack)))
@@ -601,18 +607,15 @@ class ProjectManager(QtWidgets.QWidget):
             if len(self.back_stack) >= 1 and self.current_node.subdirs_present:
                 node = self.back_stack.pop()
                 self.current_node.path = node
-                self.update_scene_list()
-                self.comment_text(comment="")
-                # print("stack length:    " + str(len(self.back_stack)))
             elif len(self.back_stack) <= 0 and \
                     self.current_node.subdirs_present:
-                comment = "  select file to navigate!"
-                self.comment_text(comment)
                 return
-            else:
+            elif not self.current_node.subdirs_present:
                 comment = "  no more subdirectories!"
                 self.comment_text(comment)
                 return
+
+        self.update_scene_list()
 
     def refresh_current_scene_list(self):
         # set font for color refresh_cmt
@@ -630,6 +633,7 @@ class ProjectManager(QtWidgets.QWidget):
         palette = self.cmt_label.palette()
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
         self.cmt_label.setPalette(palette)
+        return self.cmt_label.text()
 
     def search_directories(self):
         query = self.search_bar.text()
