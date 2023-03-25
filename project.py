@@ -285,6 +285,8 @@ class ProjectManager(QtWidgets.QWidget):
         # self.job_path.setText(set_job + '/')
         self.job_path.setText(job_label)
 
+        self.last_path_name = last_path_name
+
         self.base = os.path.basename(self.current_node.path.rstrip('/'))
         self.base_path = self.base + '/'
 
@@ -320,18 +322,24 @@ class ProjectManager(QtWidgets.QWidget):
         self.current_node.subdirs_present = False
 
         normalized_path = Path(str(self.current_node.path)).resolve()
+        print(normalized_path)
         path_parts = normalized_path.parts
+        print("path_parts:    ", path_parts)
         try:
             base_idx = path_parts.index(self.base)
         except ValueError:
             raise ValueError(f"{self.base} not found in "
                              f"{str(self.current_node.path)}")
         selected_path_parts = path_parts[base_idx:]
+        print("selected_path_parts:    ", selected_path_parts)
         resulting_path = Path(*selected_path_parts)
+        print("resulting path:    ", resulting_path)
         first_part = f"<b>{resulting_path.parts[0]}</b>"
         rest_parts = resulting_path.parts[1:]
         formatted_path = Path(first_part, *rest_parts)
         self.proj_path.setText('Path:  ' + str(formatted_path) + '/')
+
+        self.resulting_path = resulting_path
 
         if self.proj:
             self.back_btn.setEnabled(True)
@@ -533,27 +541,26 @@ class ProjectManager(QtWidgets.QWidget):
         return self.scene_list
 
     def back_button(self):
-        # print(len(self.back_stack))
-        # print("<<<    back button pressed! :D    >>>")
         home_dir = os.path.expanduser("~")
-        job_path = self.job_path.text().split('JOB:  ')[1].replace('$HOME',
-                                                                   home_dir)
+        job_path_bold = self.job_path.text().split('JOB:  ')[1].replace(
+            '$HOME', home_dir)
+        job_path = job_path_bold.replace("<b>", "").replace("</b>", "")
 
         if os.path.abspath(self.current_node.path) == job_path:
             comment = "  can't go back on JOB!"
             self.comment_text(comment)
-            # print("Can't go back any further on the $JOB PATH")
+            print("Can't go back any further on the $JOB PATH")
             return
         else:
             self.back_stack.append(self.current_node.path)
             self.current_node.path = os.path.dirname(
                 os.path.dirname(self.current_node.path))
             self.comment_text(comment="")
-            # print("going back to:    " + self.current_node.path)
+            print("going back to:    " + self.current_node.path)
 
-        self.ascending_order = True
-        self.alpha_sort_clicked = False
-        self.update_scene_list()
+            self.ascending_order = True
+            self.alpha_sort_clicked = False
+            self.update_scene_list()
 
     def forward_button(self):
         selected_item = self.scene_list.currentItem()
@@ -563,12 +570,12 @@ class ProjectManager(QtWidgets.QWidget):
             selected_path = os.path.join(self.current_node.path,
                                          selected_item.text())
             self.back_stack.clear()
-            self.comment_text(comment="")
             for child in self.current_node.children:
                 if child.path == selected_path:
                     self.current_node = child
                     self.update_scene_list()
                     break
+            self.comment_text(comment="")
         elif selected_item is not None and selected_item.text(
         ).endswith(('.usda', '.usdc')):
             # print("you have selected a .USD file")
