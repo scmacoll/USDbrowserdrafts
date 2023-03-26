@@ -496,6 +496,7 @@ class ProjectManager(QtWidgets.QWidget):
 
                 list_widget.addItem(file.text())
                 self.usd_items.append(file)
+                self.usd_items.sort()
 
             elif file.endswith('.usdc'):
                 list_widget = QtWidgets.QListWidget()
@@ -504,6 +505,7 @@ class ProjectManager(QtWidgets.QWidget):
 
                 list_widget.addItem(file.text())
                 self.usd_items.append(file)
+                self.usd_items.sort()
 
         # Add the non-usd items first
         for item, item_widget in self.non_usd_items:
