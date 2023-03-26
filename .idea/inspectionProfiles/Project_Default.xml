@@ -57,6 +57,7 @@
           <option value="hou.paneTabType.PythonPanel" />
           <option value="object.*" />
           <option value="PySide2.QtWidgets.QFontMetrics" />
+          <option value="hou" />
         </list>
       </option>
     </inspection_tool>
