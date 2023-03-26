@@ -1,5 +1,4 @@
 import os
-
 import hou
 from pathlib import Path
 from PySide2.QtCore import Qt
@@ -71,6 +70,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
         self.alpha_sort = self.ui.findChild(QtWidgets.QPushButton, 'alphasort')
         self.home_btn = self.ui.findChild(QtWidgets.QPushButton, 'homebtn')
+        self.import_btn = self.ui.findChild(QtWidgets.QPushButton, 'importbtn')
         self.reset_btn = self.ui.findChild(QtWidgets.QPushButton, 'resetbtn')
         self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
         self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
@@ -95,6 +95,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.alpha_sort.clicked.connect(self.alpha_sort_button)
         self.ref_btn.clicked.connect(self.refresh_current_scene_list)
         self.home_btn.clicked.connect(self.go_to_job_dir)
+        self.import_btn.clicked.connect(self.import_button)
         self.reset_btn.clicked.connect(self.reset_button)
         self.scene_list.doubleClicked.connect(self.double_click_forward)
         self.search_bar.textChanged.connect(self.search_directories)
@@ -153,6 +154,28 @@ class ProjectManager(QtWidgets.QWidget):
         self.setLayout(main_layout)
 
         # reload current python panel interface
+    def import_button(self):
+        self.selected_usd = self.scene_list.currentItem()
+        print("self current node path:    ", self.current_node.path)
+        if self.selected_usd is not None and self.selected_usd.text(
+        ).endswith(('.usda', '.usdc')):
+            self.import_usd()
+        else:
+            comment = "can only import usd files"
+            self.comment_text(comment)
+            return
+
+    def import_usd(self):
+        self.selected_usd = self.current_node.path + self.selected_usd.text()
+
+        loader = hou.node('/obj').createNode('geo', 'usd_loader')
+        usd_import = loader.createNode('usdimport')
+        usd_import.parm('filepath1').set(self.selected_usd)
+        usd_import.parm('importtraversal').set('std:boundables')
+
+        usd_comment = self.selected_usd.text()
+        comment = "imported: " + usd_comment
+        self.comment_text(comment)
 
     def reset_button(self):
         if self.show_reset_popup:
@@ -169,6 +192,7 @@ class ProjectManager(QtWidgets.QWidget):
             reply = msg_box.exec_()
 
             if reply == QMessageBox.Yes:
+                self.comment_text(comment="")
                 self.reset_project()
 
             if dont_show_reset.isChecked():
@@ -264,6 +288,7 @@ class ProjectManager(QtWidgets.QWidget):
     def set_project(self):
         set_job = hou.ui.selectFile(title='Select Project Folder',
                                     file_type=hou.fileType.Directory)
+        print("set_job:    ", type(set_job))
         hou.hscript('setenv JOB=' + set_job)
         self.proj = hou.getenv('JOB')
 

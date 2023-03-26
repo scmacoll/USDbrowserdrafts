@@ -462,7 +462,7 @@
      <item row="10" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="importbtn">
          <property name="text">
           <string>Import</string>
          </property>
