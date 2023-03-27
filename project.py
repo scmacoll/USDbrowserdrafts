@@ -161,7 +161,7 @@ class ProjectManager(QtWidgets.QWidget):
         ).endswith(('.usda', '.usdc')):
             self.import_usd()
         else:
-            comment = "can only import usd files"
+            comment = "can only import usd files!"
             self.comment_text(comment)
             return
 
@@ -616,6 +616,8 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.current_node.path = os.path.join(
             self.current_node.path + selected_item.text())
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
         self.update_scene_list()
 
         self.comment_text(comment="")
@@ -642,6 +644,8 @@ class ProjectManager(QtWidgets.QWidget):
                 self.comment_text(comment)
                 return
 
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
         self.update_scene_list()
 
     def refresh_current_scene_list(self):
