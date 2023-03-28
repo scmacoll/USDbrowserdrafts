@@ -2,8 +2,8 @@ import os
 import hou
 from pathlib import Path
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QLineEdit, QListWidgetItem, QHBoxLayout, \
-    QMessageBox, QCheckBox
+from PySide2.QtWidgets import (QLineEdit, QListWidgetItem, QHBoxLayout,
+    QMessageBox, QCheckBox)
 from PySide2.QtGui import QKeySequence, QBrush, QColor, QPalette
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
@@ -46,6 +46,13 @@ class Tree:
             current = current.parent
         path.reverse()
         return os.sep.join(path)
+
+
+def show():
+    project_manager = ProjectManager()
+    hou.ui.addPaneTab(project_manager, "Project Manager", True)
+    hou.ui.setPaneTabType(project_manager, hou.ui.paneTabType.Pinned)
+    hou.ui.setPaneTabIcon(project_manager, hou.ui.createQtIcon("VIEWTREE"))
 
 
 class ProjectManager(QtWidgets.QWidget):
@@ -148,12 +155,21 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
 
-
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(self.ui)
         self.setLayout(main_layout)
 
+        # # Create a pane tab for the panel
+        # self.tab = hou.ui.createPinnedTab(self, 'My Panel')
+        #
+        # # Set the pane tab icon
+        # icon_path = '/Users/stu/Downloads/image2vector(4).svg'
+        # icon = QtGui.QIcon(icon_path)
+        # hou.ui.setPaneTabType(self.tab, hou.ui.paneTabType.Pinned)
+        # hou.ui.setPaneTabIcon(self.tab, icon)
+
         # reload current python panel interface
+
     def import_button(self):
         self.selected_usd = self.scene_list.currentItem()
         print("self current node path:    ", self.current_node.path)

@@ -58,6 +58,7 @@
           <option value="object.*" />
           <option value="PySide2.QtWidgets.QFontMetrics" />
           <option value="hou" />
+          <option value="hou.Panel" />
         </list>
       </option>
     </inspection_tool>
