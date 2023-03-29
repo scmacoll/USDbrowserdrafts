@@ -48,11 +48,18 @@ class Tree:
         return os.sep.join(path)
 
 
-def show():
-    project_manager = ProjectManager()
-    hou.ui.addPaneTab(project_manager, "Project Manager", True)
-    hou.ui.setPaneTabType(project_manager, hou.ui.paneTabType.Pinned)
-    hou.ui.setPaneTabIcon(project_manager, hou.ui.createQtIcon("VIEWTREE"))
+#
+# def show():
+#     project_manager = ProjectManager()
+#     hou.ui.addPaneTab(project_manager, "Project Manager", True)
+#     hou.ui.setPaneTabType(project_manager, hou.ui.paneTabType.Pinned)
+#     hou.ui.setPaneTabIcon(project_manager, hou.ui.createQtIcon("VIEWTREE"))
+
+#
+# def show():
+#     dialog = ProjectManager()
+#     dialog.setParent(hou.qt.floatingPanelWindow(None), QtCore.Qt.Window)
+#     dialog.show()
 
 
 class ProjectManager(QtWidgets.QWidget):
