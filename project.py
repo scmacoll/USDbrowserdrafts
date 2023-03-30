@@ -345,6 +345,7 @@ class ProjectManager(QtWidgets.QWidget):
 
     def go_to_job_dir(self):
         self.current_node.path = self.proj
+        self.back_stack.clear()
         self.ascending_order = True
         self.alpha_sort_clicked = False
         self.update_scene_list()
