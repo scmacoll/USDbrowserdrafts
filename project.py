@@ -1,10 +1,8 @@
 import os
 import hou
 from pathlib import Path
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (QLineEdit, QListWidgetItem, QHBoxLayout,
-    QMessageBox, QCheckBox)
-from PySide2.QtGui import QKeySequence, QBrush, QColor, QPalette
+from PySide2.QtWidgets import QHBoxLayout, QMessageBox, QCheckBox
+from PySide2.QtGui import QKeySequence
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
 
