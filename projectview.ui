@@ -344,7 +344,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>15</width>
+           <width>20</width>
            <height>20</height>
           </size>
          </property>
@@ -395,7 +395,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>15</width>
+           <width>17</width>
            <height>20</height>
           </size>
          </property>
@@ -449,7 +449,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>15</width>
+           <width>17</width>
            <height>20</height>
           </size>
          </property>
@@ -500,7 +500,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>15</width>
+           <width>17</width>
            <height>20</height>
           </size>
          </property>
@@ -576,7 +576,7 @@
      <item row="1" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QLabel" name="usdlabel">
+        <widget class="QLabel" name="usdlogo">
          <property name="maximumSize">
           <size>
            <width>28</width>
