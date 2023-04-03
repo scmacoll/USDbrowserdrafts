@@ -448,7 +448,6 @@ class ProjectManager(QtWidgets.QWidget):
             usda_file_present = usda_file_count > 0
             usdc_file_present = usdc_file_count > 0
 
-
         if usd_file_present and usda_file_present and usdc_file_present:
             self.usd_label.setText("usd")
             self.usda_label.setText("usda")
@@ -470,7 +469,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.usda_label.setText("usda")
             self.usdc_label.setText("usdc")
         elif not usd_file_present and usda_file_present and not usdc_file_present:
-            self.usd_label.setText("usd")
+            self.usd_label.setText("")
             self.usda_label.setText("usda")
             self.usdc_label.setText("")
         elif usd_file_present and not usda_file_present and not usdc_file_present:
@@ -600,17 +599,27 @@ class ProjectManager(QtWidgets.QWidget):
                 usda_str_length = len(str(usda_file_count))
                 usdc_str_length = len(str(usdc_file_count))
 
-                print("usda_str_length = ", usda_str_length)
-                print("usdc_str_length = ", usdc_str_length)
-                print("max_usda_width = ", max_usda_width)
-                print("max_usdc_width = ", max_usdc_width)
+                if max_usda_width < 4:
+                    max_usda_width = 4
+                if max_usda_width < 4:
+                    max_usda_width = 4
 
-                usda_padding = '&nbsp;' * (max_usda_width - usda_str_length)
-                usdc_padding = '&nbsp;' * (max_usdc_width - usdc_str_length)
+                usda_padding = '&nbsp;' * (4 - usda_str_length)
+                usdc_padding = '&nbsp;' * (4 - usdc_str_length)
 
+                # max_usda_padding = 0
+                # max_usdc_padding = 0
+                # max_usda_padding = max(max_usda_padding, len(str(usda_padding)))
+                # max_usdc_padding = max(max_usdc_padding, len(str(usdc_padding)))
+
+                # if max_usda_width < len(str('&nbsp;' * 4)):
+                #     usda_padding = '&nbsp;' * 4
+                # if max_usdc_width < len(str('&nbsp;' * 4)):
+                #     usdc_padding = '&nbsp;' * 4
+                fill_space = ""
                 end_space_1 = '&nbsp;'
                 end_space_4 = '&nbsp;' * 4
-
+                #
                 if usd_file_count == 0 and usda_file_count == 0 and usdc_file_count == 0:
                     usd_file_count = '&nbsp;' * 3
                     usda_file_count = '&nbsp;' * 3
@@ -679,6 +688,169 @@ class ProjectManager(QtWidgets.QWidget):
                                 f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
                                 f"<font color='#5DAADA'>" \
                                 f"({usdc_file_count})</font>{end_space_1}"
+                #
+                # if usd_file_count == 0 and usda_file_count == 0 and usdc_file_count == 0:
+                #     usd_file_count = '&nbsp;' * 6
+                #     usda_file_count = '&nbsp;' * 6
+                #     usdc_file_count = '&nbsp;' * 6
+                #     item_text = f"<font color='#36C3F1'>{usd_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#1F8ECD'>{usda_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#5DAADA'>{usdc_file_count}</font>" \
+                #                 f"{end_space_1}"
+                # elif usd_file_count == 0 and usda_file_count == 0:
+                #     usd_file_count = '&nbsp;' * 6
+                #     usda_file_count = '&nbsp;' * 6
+                #
+                #     if len(str(usdc_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     item_text = f"<font color='#36C3F1'>{usd_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#1F8ECD'>{usda_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#5DAADA'>({usdc_file_count})</font>" \
+                #                 f"{end_space_1}"
+                # elif usd_file_count == 0 and usdc_file_count == 0:
+                #     usd_file_count = '&nbsp;' * 6
+                #     usdc_file_count = '&nbsp;' * 6
+                #
+                #     if len(str(usda_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     item_text = f"<font color='#36C3F1'>{usd_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#1F8ECD'>({usda_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#5DAADA'>{usdc_file_count}</font>" \
+                #                 f"{end_space_1}"
+                # elif usda_file_count == 0 and usdc_file_count == 0:
+                #     usda_file_count = '&nbsp;' * 6
+                #     usdc_file_count = '&nbsp;' * 6
+                #
+                #     if len(str(usd_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     item_text = f"{fill_space}<font color='#36C3F1'>({usd_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#1F8ECD'>{usda_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#5DAADA'>{usdc_file_count}</font>" \
+                #                 f"{end_space_1}"
+                # elif usd_file_count == 0:
+                #     usd_file_count = '&nbsp;' * 6
+                #
+                #     if len(str(usda_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     if len(str(usdc_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     item_text = f"<font color='#36C3F1'>{usd_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#1F8ECD'>({usda_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#5DAADA'>({usdc_file_count})</font>" \
+                #                 f"{end_space_1}"
+                # elif usda_file_count == 0:
+                #     usda_file_count = '&nbsp;' * 6
+                #
+                #     if len(str(usd_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     if len(str(usdc_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     item_text = f"{fill_space}<font color='#36C3F1'>({usd_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#1F8ECD'>{usda_file_count}</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#5DAADA'>({usdc_file_count})</font>" \
+                #                 f"{end_space_1}"
+                # elif usdc_file_count == 0:
+                #     usdc_file_count = '&nbsp;' * 6
+                #
+                #     if len(str(usd_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     if len(str(usda_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     item_text = f"{fill_space}<font color='#36C3F1'>({usd_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#1F8ECD'>({usda_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"<font color='#5DAADA'>{usdc_file_count}</font>" \
+                #                 f"{end_space_1}"
+                # else:
+                #     if len(str(usd_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     if len(str(usda_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     if len(str(usdc_file_count)) is 3:
+                #         fill_space = '&nbsp;'
+                #     elif len(str(usd_file_count)) is 2:
+                #         fill_space = '&nbsp;' * 2
+                #     elif len(str(usd_file_count)) is 1:
+                #         fill_space = '&nbsp;' * 3
+                #
+                #     item_text = f"{fill_space}<font color='#36C3F1'>({usd_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#1F8ECD'>({usda_file_count})</font>" \
+                #                 f"{end_space_4}" \
+                #                 f"{fill_space}<font color='#5DAADA'>({usdc_file_count})</font>" \
+                #                 f"{end_space_1}"
+
+                print("usd_file_count", len(str(usd_file_count)))
+                print("usda_file_count", len(str(usda_file_count)))
+                print("usdc_file_count", len(str(usdc_file_count)))
 
                 item = QtWidgets.QListWidgetItem(f"{file}")
                 # item.setTextAlignment(QtCore.Qt.AlignLeft)
