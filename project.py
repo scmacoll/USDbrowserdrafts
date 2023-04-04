@@ -1,7 +1,7 @@
 import os
 import hou
 from pathlib import Path
-from PySide2.QtWidgets import QHBoxLayout, QMessageBox, QCheckBox
+from PySide2.QtWidgets import QMessageBox, QCheckBox
 from PySide2.QtGui import QKeySequence
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
@@ -12,7 +12,6 @@ class Node:
         self.children = []
 
     def add_child(self, node):
-        # print("Adding child:", node.path)
         self.children.append(node)
 
 
@@ -21,10 +20,8 @@ class Tree:
         self.root = Node(root)
 
     def add_path(self, path):
-        # print("Adding path:", path)
         current = self.root
         for part in path.split(os.sep):
-            # print("part:    " + part)
             if not part:
                 continue
             found = None
@@ -45,8 +42,6 @@ class Tree:
         path.reverse()
         return os.sep.join(path)
 
-
-#
 # def show():
 #     project_manager = ProjectManager()
 #     hou.ui.addPaneTab(project_manager, "Project Manager", True)
@@ -94,12 +89,12 @@ class ProjectManager(QtWidgets.QWidget):
         self.usd_label = self.ui.findChild(QtWidgets.QLabel, 'usdlbl')
         self.usda_label = self.ui.findChild(QtWidgets.QLabel, 'usdalbl')
         self.usdc_label = self.ui.findChild(QtWidgets.QLabel, 'usdclbl')
+        self.start_label = self.ui.findChild(QtWidgets.QLabel, 'startlbl')
+        # self.init_space = self.ui.findChild(QtWidgets.QSpacerItem, 'initspace')
 
         self.default_proj_name = self.proj_name.text()
         self.default_proj_path = self.proj_path.text()
         self.default_job_path = self.job_path.text()
-
-        # self.current_order = Qt.AscendingOrder
 
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
@@ -145,12 +140,14 @@ class ProjectManager(QtWidgets.QWidget):
         self.ascending_order = True
         self.alpha_sort_clicked = False
 
-        self.search_bar.setEnabled(False)
+        self.start_label.setVisible(True)
+        self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
         self.alpha_sort.setEnabled(False)
         self.ref_btn.setEnabled(False)
         self.home_btn.setEnabled(False)
+        self.import_btn.setEnabled(False)
 
         self.usd_label.setVisible(False)
         self.usda_label.setVisible(False)
@@ -235,9 +232,24 @@ class ProjectManager(QtWidgets.QWidget):
         self.job_path.setText(self.default_job_path)
         self.search_bar.installEventFilter(self)
 
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
+
+        self.start_label.setVisible(True)
+        self.search_bar.setVisible(False)
+        self.back_btn.setEnabled(False)
+        self.fwd_btn.setEnabled(False)
+        self.alpha_sort.setEnabled(False)
+        self.ref_btn.setEnabled(False)
+        self.home_btn.setEnabled(False)
+        self.import_btn.setEnabled(False)
+
         self.usd_label.setVisible(False)
         self.usda_label.setVisible(False)
         self.usdc_label.setVisible(False)
+
+        comment = ""
+        self.comment_text(comment)
 
         self.scene_list.clear()
 
@@ -374,6 +386,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.clear()
         self.current_node.subdirs_present = False
 
+        self.start_label.setVisible(False)
         self.usd_label.setVisible(True)
         self.usda_label.setVisible(True)
         self.usdc_label.setVisible(True)
@@ -402,10 +415,11 @@ class ProjectManager(QtWidgets.QWidget):
         if self.proj:
             self.back_btn.setEnabled(True)
             self.fwd_btn.setEnabled(True)
-            self.search_bar.setEnabled(True)
+            self.search_bar.setVisible(True)
             self.alpha_sort.setEnabled(True)
             self.ref_btn.setEnabled(True)
             self.home_btn.setEnabled(True)
+            self.import_btn.setEnabled(True)
 
         self.current_node.path = self.current_node.path + '/'
         if self.current_node.path[-2:] == '//':
