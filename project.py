@@ -42,18 +42,6 @@ class Tree:
         path.reverse()
         return os.sep.join(path)
 
-# def show():
-#     project_manager = ProjectManager()
-#     hou.ui.addPaneTab(project_manager, "Project Manager", True)
-#     hou.ui.setPaneTabType(project_manager, hou.ui.paneTabType.Pinned)
-#     hou.ui.setPaneTabIcon(project_manager, hou.ui.createQtIcon("VIEWTREE"))
-
-#
-# def show():
-#     dialog = ProjectManager()
-#     dialog.setParent(hou.qt.floatingPanelWindow(None), QtCore.Qt.Window)
-#     dialog.show()
-
 
 class ProjectManager(QtWidgets.QWidget):
     def __init__(self):
@@ -722,13 +710,12 @@ class ProjectManager(QtWidgets.QWidget):
             self.update_scene_list()
 
     def forward_button(self):
-        print("forward button clicked")
         selected_item = self.scene_list.currentItem()
 
         if selected_item is not None and os.path.isdir(os.path.join(
                 self.current_node.path, selected_item.text())):
-            selected_path = os.path.join(self.current_node.path,
-                                         selected_item.text())
+            selected_path = os.path.join(
+                self.current_node.path, selected_item.text())
             self.back_stack.clear()
             for child in self.current_node.children:
                 if child.path == selected_path:
@@ -736,9 +723,8 @@ class ProjectManager(QtWidgets.QWidget):
                     self.update_scene_list()
                     break
             self.comment_text(comment="")
-        elif selected_item is not None and selected_item.text(
-        ).endswith(('.usda', '.usdc')):
-            # print("you have selected a .USD file")
+        elif selected_item is not None and selected_item.text().endswith(
+                ('.usda', '.usdc')):
             return
         else:
             self.comment_text(comment="")
