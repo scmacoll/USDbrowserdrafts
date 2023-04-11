@@ -58,7 +58,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.ui = loader.load('/Users/stu/Library/Preferences/houdini/19.5'
                               '/scripts/python/projectview/projectview.ui')
 
-        # get UI elements (designer)
+        # get UI elements (QtDesigner)
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
         self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.fwd_btn = self.ui.findChild(QtWidgets.QPushButton, 'fwdbtn')
@@ -89,9 +89,9 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
         self.fwd_btn.clicked.connect(self.redo_click_forward)
-        self.alpha_sort.clicked.connect(self.alpha_sort_button)
-        self.ref_btn.clicked.connect(self.refresh_current_scene_list)
-        self.home_btn.clicked.connect(self.go_to_job_dir)
+        self.alpha_sort.clicked.connect(self.sort_button)
+        self.ref_btn.clicked.connect(self.refresh_button)
+        self.home_btn.clicked.connect(self.home_button)
         self.import_btn.clicked.connect(self.import_button)
         self.reset_btn.clicked.connect(self.reset_button)
         self.scene_list.doubleClicked.connect(self.double_click_forward)
@@ -143,221 +143,43 @@ class ProjectManager(QtWidgets.QWidget):
         self.usdc_label.setVisible(False)
         self.show_reset_popup = True
         self.enter_pressed_on_search_bar = False
-        self.scene_list.mousePressEvent = self.mousePressEvent
-        self.scene_list.keyPressEvent = self.keyPressEvent
+
+        # self.scene_list.mousePressEvent = self.mousePressEvent
+        # self.scene_list.keyPressEvent = self.keyPressEvent
 
         # Initialize the panel
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(self.ui)
         self.setLayout(main_layout)
 
-    def import_button(self):
-        self.selected_usd = self.scene_list.currentItem()
-        print("self current node path:    ", self.current_node.path)
-        if self.selected_usd is not None and self.selected_usd.text(
-        ).endswith(('.usda', '.usdc')):
-            self.import_usd()
-        else:
-            comment = "can only import usd files!"
-            self.comment_text(comment)
-            return
-
-    def import_usd(self):
-        self.selected_usd = self.current_node.path + self.selected_usd.text()
-
-        loader = hou.node('/obj').createNode('geo', 'usd_loader')
-        usd_import = loader.createNode('usdimport')
-        usd_import.parm('filepath1').set(self.selected_usd)
-        usd_import.parm('importtraversal').set('std:boundables')
-
-        usd_comment = self.selected_usd.text()
-        comment = "imported: " + usd_comment
-        self.comment_text(comment)
-
-    def reset_button(self):
-        if self.show_reset_popup:
-            msg_box = QMessageBox()
-            msg_box.setWindowTitle('Reset')
-            msg_box.setText('Are you sure you want to reset?')
-            msg_box.setIcon(QMessageBox.Warning)
-            msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            msg_box.setDefaultButton(QMessageBox.No)
-
-            dont_show_reset = QCheckBox("Don't ask again", msg_box)
-            msg_box.setCheckBox(dont_show_reset)
-
-            reply = msg_box.exec_()
-
-            if reply == QMessageBox.Yes:
-                self.comment_text(comment="")
-                self.reset_project()
-
-            if dont_show_reset.isChecked():
-                self.show_reset_popup = False
-
-        else:
-            self.reset_project()
-
-    def reset_project(self):
-        self.tree = Tree()
-        self.current_node = self.tree.root
-        self.back_stack.clear()
-        self.proj = None
-
-        self.proj_name.setText(self.default_proj_name)
-        self.proj_path.setText(self.default_proj_path)
-        self.job_path.setText(self.default_job_path)
-        self.search_bar.installEventFilter(self)
-
-        self.ascending_order = True
-        self.alpha_sort_clicked = False
-
-        self.start_label.setVisible(True)
-        self.search_bar.setVisible(False)
-        self.back_btn.setEnabled(False)
-        self.fwd_btn.setEnabled(False)
-        self.alpha_sort.setEnabled(False)
-        self.ref_btn.setEnabled(False)
-        self.home_btn.setEnabled(False)
-        self.import_btn.setEnabled(False)
-
-        self.usd_label.setVisible(False)
-        self.usda_label.setVisible(False)
-        self.usdc_label.setVisible(False)
-
-        comment = ""
-        self.comment_text(comment)
-
-        self.scene_list.clear()
-
-    def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            item = self.scene_list.itemAt(event.pos())
-            if item:
-                if item.isSelected():
-                    self.scene_list.clearSelection()
-            else:
-                self.scene_list.clearSelection()
-        self.enter_pressed_on_search_bar = False
-        super(ProjectManager, self).mousePressEvent(event)
-
-    def keyPressEvent(self, event):
-
-        if event.key() == QtCore.Qt.Key_Escape:
-            print("escape KEY pressed")
-            if self.search_bar.hasFocus() and \
-                    self.search_bar.text() == '':
-                print("4th if escape pressed")
-                self.search_bar.clearFocus()
-            elif self.search_bar.hasFocus():
-                print("1st if escape pressed")
-                self.search_bar.clear()
-            elif self.enter_pressed_on_search_bar:
-                print("2nd if escape pressed")
-                self.scene_list.clearSelection()
-                self.search_bar.setFocus()
-            elif self.scene_list.hasFocus():
-                print("3rd if escape pressed")
-                self.scene_list.clearSelection()
-
-            super(ProjectManager, self).keyPressEvent(event)
-
-        elif event.key() == QtCore.Qt.Key_Backspace:
-            self.scene_list.clearSelection()
-            super(ProjectManager, self).keyPressEvent(event)
-
-        elif event.key() == QtCore.Qt.Key_Delete:
-            self.scene_list.clearSelection()
-            super(ProjectManager, self).keyPressEvent(event)
-
-        elif event.key() == QtCore.Qt.Key_Return:
-            if self.search_bar.hasFocus():
-                self.search_bar.clearFocus()
-                self.scene_list.setCurrentRow(0)
-                self.scene_list.setFocus()
-                self.enter_pressed_on_search_bar = True
-            else:
-                self.double_click_forward()
-                self.enter_pressed_on_search_bar = False
-            print(self.enter_pressed_on_search_bar)
-            super(ProjectManager, self).keyPressEvent(event)
-
-        elif event.key() == QtCore.Qt.Key_Left:
-            if self.scene_list.hasFocus():
-                self.back_button()
-
-        elif event.key() == QtCore.Qt.Key_Right:
-            if self.scene_list.hasFocus():
-                self.double_click_forward()
-
-        elif event.matches(QKeySequence("Ctrl+Backspace")) and \
-                self.search_bar.hasFocus():
-            self.search_bar.clear()
-            super(ProjectManager, self).keyPressEvent(event)
-
-    def keyReleaseEvent(self, event):
-        if event.key() not in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down,
-                               QtCore.Qt.Key_Return):
-            self.enter_pressed_on_search_bar = False
-        super(ProjectManager, self).keyReleaseEvent(event)
-
+    # Project-related methods
     def set_project(self):
         set_job = hou.ui.selectFile(title='Select Project Folder',
                                     file_type=hou.fileType.Directory)
-        print("set_job:    ", type(set_job))
         hou.hscript('setenv JOB=' + set_job)
         self.proj = hou.getenv('JOB')
 
         self.tree = Tree(self.proj)
-        self.current_node = self.tree.root  # create a new node
-        self.tree.add_path(self.proj)  # add path to tree node
+        self.current_node = self.tree.root
+        self.tree.add_path(self.proj)
 
+        # Set QtLabel Content
         proj_name = '  USD Project:  ' + set_job.split('/')[-2]
-
         dir_name, base_name = os.path.split(set_job)
         before_dir_name, last_path_name = os.path.split(dir_name)
-
         job_label = 'JOB:  ' + before_dir_name + '/' + '<b>' + \
                     last_path_name + '</b>'
-
-        # set_job = 'JOB:  ' + os.path.dirname(set_job)
-
         self.proj_name.setText(proj_name)
-        # self.job_path.setText(set_job + '/')
         self.job_path.setText(job_label)
-
         self.last_path_name = last_path_name
-
         self.base = os.path.basename(self.current_node.path.rstrip('/'))
         self.base_path = self.base + '/'
 
         #  Create a Node Instance
         self.current_node = self.tree.root
+
         self.update_scene_list()
         self.comment_text(comment="")
-
-    def go_to_job_dir(self):
-        self.current_node.path = self.proj
-        self.back_stack.clear()
-        self.ascending_order = True
-        self.alpha_sort_clicked = False
-        self.update_scene_list()
-        comment = "  returned to JOB!"
-        self.comment_text(comment)
-
-    def alpha_sort_button(self):
-        self.alpha_sort_clicked = True
-        self.update_scene_list()
-
-    def sort_items_alpha(self):
-        if not self.ascending_order:
-            self.ascending_order = True
-            self.sorted_items.sort()
-            self.comment_text(comment="")
-        elif self.ascending_order:
-            self.ascending_order = False
-            self.sorted_items.sort(reverse=True)
-            self.comment_text(comment="")
 
     def update_scene_list(self):
         self.scene_list.clear()
@@ -480,7 +302,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.sorted_items.sort()
 
         if self.alpha_sort_clicked:
-            self.sort_items_alpha()
+            self.sort_items()
 
         # Replace duplicates in the original list with items from the sorted
         # list
@@ -676,6 +498,84 @@ class ProjectManager(QtWidgets.QWidget):
 
         return self.scene_list
 
+    def reset_project(self):
+        self.tree = Tree()
+        self.current_node = self.tree.root
+        self.back_stack.clear()
+        self.proj = None
+
+        self.proj_name.setText(self.default_proj_name)
+        self.proj_path.setText(self.default_proj_path)
+        self.job_path.setText(self.default_job_path)
+        self.search_bar.installEventFilter(self)
+
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
+
+        self.start_label.setVisible(True)
+        self.search_bar.setVisible(False)
+        self.back_btn.setEnabled(False)
+        self.fwd_btn.setEnabled(False)
+        self.alpha_sort.setEnabled(False)
+        self.ref_btn.setEnabled(False)
+        self.home_btn.setEnabled(False)
+        self.import_btn.setEnabled(False)
+
+        self.usd_label.setVisible(False)
+        self.usda_label.setVisible(False)
+        self.usdc_label.setVisible(False)
+
+        comment = ""
+        self.comment_text(comment)
+
+        self.scene_list.clear()
+
+    # Button-related methods
+    def reset_button(self):
+        if self.show_reset_popup:
+            msg_box = QMessageBox()
+            msg_box.setWindowTitle('Reset')
+            msg_box.setText('Are you sure you want to reset?')
+            msg_box.setIcon(QMessageBox.Warning)
+            msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            msg_box.setDefaultButton(QMessageBox.No)
+
+            dont_show_reset = QCheckBox("Don't ask again", msg_box)
+            msg_box.setCheckBox(dont_show_reset)
+
+            reply = msg_box.exec_()
+
+            if reply == QMessageBox.Yes:
+                self.comment_text(comment="")
+                self.reset_project()
+
+            if dont_show_reset.isChecked():
+                self.show_reset_popup = False
+
+        else:
+            self.reset_project()
+
+    def refresh_button(self):
+        self.back_stack.clear()
+        comment = "  refreshed directory!"
+        self.comment_text(comment)
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
+        self.update_scene_list()
+
+    def home_button(self):
+        self.current_node.path = self.proj
+        self.back_stack.clear()
+        self.ascending_order = True
+        self.alpha_sort_clicked = False
+        self.update_scene_list()
+        comment = "  returned to JOB!"
+        self.comment_text(comment)
+
+    def sort_button(self):
+        self.alpha_sort_clicked = True
+        self.update_scene_list()
+
     def back_button(self):
         home_dir = os.path.expanduser("~")
         job_path_bold = self.job_path.text().split('JOB:  ')[1].replace(
@@ -727,12 +627,71 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.comment_text(comment="")
 
-    def double_click_forward(self):
-        self.back_stack.clear()
-        self.forward_button()
+    def import_button(self):
+        self.selected_usd = self.scene_list.currentItem()
+        print("self current node path:    ", self.current_node.path)
+        if self.selected_usd is not None and self.selected_usd.text(
+        ).endswith(('.usda', '.usdc')):
+            self.import_usd()
+        else:
+            comment = "can only import usd files!"
+            self.comment_text(comment)
+            return
 
+    # Widget functionality methods
+    def import_usd(self):
+        self.selected_usd = self.current_node.path + self.selected_usd.text()
+
+        loader = hou.node('/obj').createNode('geo', 'usd_loader')
+        usd_import = loader.createNode('usdimport')
+        usd_import.parm('filepath1').set(self.selected_usd)
+        usd_import.parm('importtraversal').set('std:boundables')
+
+        usd_comment = self.selected_usd.text()
+        comment = "imported: " + usd_comment
+        self.comment_text(comment)
+
+    def search_directories(self):
+        query = self.search_bar.text()
+        if query:
+            self.scene_list.clear()
+            self.current_node.subdirs_present = False
+            items = os.listdir(self.current_node.path)
+            items.sort()
+            for file in items:
+                path = os.path.join(self.current_node.path, file)
+                if os.path.isdir(path) and query.lower() in file.lower():
+                    self.scene_list.addItem(file)
+                    self.tree.add_path(path + '/')
+                    self.tree.node = self.current_node
+                    self.current_node.subdirs_present = True
+                elif file.endswith('.usda') and query.lower() in file.lower():
+                    self.scene_list.addItem(file)
+        else:
+            self.update_scene_list()
+
+    def sort_items(self):
+        if not self.ascending_order:
+            self.ascending_order = True
+            self.sorted_items.sort()
+            self.comment_text(comment="")
+        elif self.ascending_order:
+            self.ascending_order = False
+            self.sorted_items.sort(reverse=True)
+            self.comment_text(comment="")
+
+    def comment_text(self, comment):
+        font = QtGui.QFont("TerminessTTF Nerd Font Mono", 12, QtGui.QFont.Bold)
+        self.cmt_label.setFont(font)
+        self.cmt_label.setText(comment)
+        palette = self.cmt_label.palette()
+        palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
+        self.cmt_label.setPalette(palette)
+        return self.cmt_label.text()
+
+    # Navigation Methods
     def redo_click_forward(self):
-        print("redo click forward button pressed! :D")
+        # Forward button acts as a forward redo button
         selected_item = self.scene_list.currentItem()
         # print("<<<    redo click forward button pressed! :D    >>>")
         # print("stack length:    " + str(len(self.back_stack)))
@@ -753,39 +712,80 @@ class ProjectManager(QtWidgets.QWidget):
         self.alpha_sort_clicked = False
         self.update_scene_list()
 
-    def refresh_current_scene_list(self):
-        # set font for color refresh_cmt
+    def double_click_forward(self):
+        # Double clicking a directory acts as a forward button
         self.back_stack.clear()
-        comment = "  refreshed directory!"
-        self.comment_text(comment)
-        self.ascending_order = True
-        self.alpha_sort_clicked = False
-        self.update_scene_list()
+        self.forward_button()
 
-    def comment_text(self, comment):
-        font = QtGui.QFont("TerminessTTF Nerd Font Mono", 12, QtGui.QFont.Bold)
-        self.cmt_label.setFont(font)
-        self.cmt_label.setText(comment)
-        palette = self.cmt_label.palette()
-        palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
-        self.cmt_label.setPalette(palette)
-        return self.cmt_label.text()
+    # Event handling methods
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            item = self.scene_list.itemAt(event.pos())
+            if item:
+                if item.isSelected():
+                    self.scene_list.clearSelection()
+            else:
+                self.scene_list.clearSelection()
+        self.enter_pressed_on_search_bar = False
+        super(ProjectManager, self).mousePressEvent(event)
 
-    def search_directories(self):
-        query = self.search_bar.text()
-        if query:
-            self.scene_list.clear()
-            self.current_node.subdirs_present = False
-            items = os.listdir(self.current_node.path)
-            items.sort()
-            for file in items:
-                path = os.path.join(self.current_node.path, file)
-                if os.path.isdir(path) and query.lower() in file.lower():
-                    self.scene_list.addItem(file)
-                    self.tree.add_path(path + '/')
-                    self.tree.node = self.current_node
-                    self.current_node.subdirs_present = True
-                elif file.endswith('.usda') and query.lower() in file.lower():
-                    self.scene_list.addItem(file)
-        else:
-            self.update_scene_list()
+    def keyPressEvent(self, event):
+
+        if event.key() == QtCore.Qt.Key_Escape:
+            print("escape KEY pressed")
+            if self.search_bar.hasFocus() and \
+                    self.search_bar.text() == '':
+                print("4th if escape pressed")
+                self.search_bar.clearFocus()
+            elif self.search_bar.hasFocus():
+                print("1st if escape pressed")
+                self.search_bar.clear()
+            elif self.enter_pressed_on_search_bar:
+                print("2nd if escape pressed")
+                self.scene_list.clearSelection()
+                self.search_bar.setFocus()
+            elif self.scene_list.hasFocus():
+                print("3rd if escape pressed")
+                self.scene_list.clearSelection()
+
+            super(ProjectManager, self).keyPressEvent(event)
+
+        elif event.key() == QtCore.Qt.Key_Backspace:
+            self.scene_list.clearSelection()
+            super(ProjectManager, self).keyPressEvent(event)
+
+        elif event.key() == QtCore.Qt.Key_Delete:
+            self.scene_list.clearSelection()
+            super(ProjectManager, self).keyPressEvent(event)
+
+        elif event.key() == QtCore.Qt.Key_Return:
+            if self.search_bar.hasFocus():
+                self.search_bar.clearFocus()
+                self.scene_list.setCurrentRow(0)
+                self.scene_list.setFocus()
+                self.enter_pressed_on_search_bar = True
+            else:
+                self.double_click_forward()
+                self.enter_pressed_on_search_bar = False
+            print(self.enter_pressed_on_search_bar)
+            super(ProjectManager, self).keyPressEvent(event)
+
+        # Forward and back directory with arrow keys
+        elif event.key() == QtCore.Qt.Key_Left:
+            if self.scene_list.hasFocus():
+                self.back_button()
+        elif event.key() == QtCore.Qt.Key_Right:
+            if self.scene_list.hasFocus():
+                self.double_click_forward()
+
+        # Delete all text in search bar
+        elif event.matches(QKeySequence("Ctrl+Backspace")) and \
+                self.search_bar.hasFocus():
+            self.search_bar.clear()
+            super(ProjectManager, self).keyPressEvent(event)
+
+    def keyReleaseEvent(self, event):
+        if event.key() not in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down,
+                               QtCore.Qt.Key_Return):
+            self.enter_pressed_on_search_bar = False
+        super(ProjectManager, self).keyReleaseEvent(event)
