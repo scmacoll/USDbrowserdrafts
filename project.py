@@ -77,7 +77,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.usd_label = self.ui.findChild(QtWidgets.QLabel, 'usdlbl')
         self.usda_label = self.ui.findChild(QtWidgets.QLabel, 'usdalbl')
         self.usdc_label = self.ui.findChild(QtWidgets.QLabel, 'usdclbl')
-        self.start_label = self.ui.findChild(QtWidgets.QLabel, 'startlbl')
+        self.init_label = self.ui.findChild(QtWidgets.QLabel, 'startlbl')
 
         # set default text values for UI elements
         self.default_proj_name = self.proj_name.text()
@@ -130,7 +130,7 @@ class ProjectManager(QtWidgets.QWidget):
         # set default values for variables
         self.ascending_order = True
         self.alpha_sort_clicked = False
-        self.start_label.setVisible(True)
+        self.init_label.setVisible(True)
         self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
@@ -143,6 +143,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.usdc_label.setVisible(False)
         self.show_reset_popup = True
         self.enter_pressed_on_search_bar = False
+        self.current_node.subdirs_present = False
 
         # self.scene_list.mousePressEvent = self.mousePressEvent
         # self.scene_list.keyPressEvent = self.keyPressEvent
@@ -152,7 +153,7 @@ class ProjectManager(QtWidgets.QWidget):
         main_layout.addWidget(self.ui)
         self.setLayout(main_layout)
 
-    # Project-related methods
+# Project-related methods
     def set_project(self):
         set_job = hou.ui.selectFile(title='Select Project Folder',
                                     file_type=hou.fileType.Directory)
@@ -173,7 +174,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.job_path.setText(job_label)
         self.last_path_name = last_path_name
         self.base = os.path.basename(self.current_node.path.rstrip('/'))
-        self.base_path = self.base + '/'
 
         #  Create a Node Instance
         self.current_node = self.tree.root
@@ -183,18 +183,18 @@ class ProjectManager(QtWidgets.QWidget):
 
     def update_scene_list(self):
         self.scene_list.clear()
-        self.current_node.subdirs_present = False
 
-        self.start_label.setVisible(False)
+        usd_font = QtGui.QFont("Consolas", 13, QtGui.QFont.Normal, True)
+
+        self.init_label.setVisible(False)
         self.usd_label.setVisible(True)
         self.usda_label.setVisible(True)
         self.usdc_label.setVisible(True)
-
-        usd_font = QtGui.QFont("Consolas", 13, QtGui.QFont.Normal, True)
         self.usd_label.setFont(usd_font)
         self.usda_label.setFont(usd_font)
         self.usdc_label.setFont(usd_font)
 
+        # Set `Path` Label to current path
         normalized_path = Path(str(self.current_node.path)).resolve()
         path_parts = normalized_path.parts
         try:
@@ -209,7 +209,7 @@ class ProjectManager(QtWidgets.QWidget):
         formatted_path = Path(first_part, *rest_parts)
         self.proj_path.setText('Path:  ' + str(formatted_path) + '/')
 
-        self.resulting_path = resulting_path
+        # self.resulting_path = resulting_path
 
         if self.proj:
             self.back_btn.setEnabled(True)
@@ -512,7 +512,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.ascending_order = True
         self.alpha_sort_clicked = False
 
-        self.start_label.setVisible(True)
+        self.init_label.setVisible(True)
         self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
@@ -530,7 +530,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.scene_list.clear()
 
-    # Button-related methods
+# Button-related methods
     def reset_button(self):
         if self.show_reset_popup:
             msg_box = QMessageBox()
@@ -638,7 +638,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.comment_text(comment)
             return
 
-    # Widget functionality methods
+# Widget functionality methods
     def import_usd(self):
         self.selected_usd = self.current_node.path + self.selected_usd.text()
 
@@ -689,7 +689,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.cmt_label.setPalette(palette)
         return self.cmt_label.text()
 
-    # Navigation Methods
+# Navigation Methods
     def redo_click_forward(self):
         # Forward button acts as a forward redo button
         selected_item = self.scene_list.currentItem()
@@ -717,7 +717,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_stack.clear()
         self.forward_button()
 
-    # Event handling methods
+# Event handling methods
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             item = self.scene_list.itemAt(event.pos())
