@@ -47,13 +47,13 @@ class ProjectManager(QtWidgets.QWidget):
     def __init__(self):
         super(ProjectManager, self).__init__()
 
+        # Set up data structures
         self.tree = Tree()
         self.current_node = self.tree.root
-        print("    REFRESH    ")
-
+        # print("    REFRESH    ")
         self.back_stack = []
 
-        # Load UI file
+        # Load QtDesigner UI file
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load('/Users/stu/Library/Preferences/houdini/19.5'
                               '/scripts/python/projectview/projectview.ui')
@@ -78,12 +78,13 @@ class ProjectManager(QtWidgets.QWidget):
         self.usda_label = self.ui.findChild(QtWidgets.QLabel, 'usdalbl')
         self.usdc_label = self.ui.findChild(QtWidgets.QLabel, 'usdclbl')
         self.start_label = self.ui.findChild(QtWidgets.QLabel, 'startlbl')
-        # self.init_space = self.ui.findChild(QtWidgets.QSpacerItem, 'initspace')
 
+        # set default text values for UI elements
         self.default_proj_name = self.proj_name.text()
         self.default_proj_path = self.proj_path.text()
         self.default_job_path = self.job_path.text()
 
+        # connect UI elements to functions
         self.set_proj.clicked.connect(self.set_project)
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
@@ -96,6 +97,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.scene_list.doubleClicked.connect(self.double_click_forward)
         self.search_bar.textChanged.connect(self.search_directories)
 
+        # set icons for UI elements
         back_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                          '/back.svg'
         back_icon = QtGui.QIcon(back_icon_path)
@@ -125,9 +127,9 @@ class ProjectManager(QtWidgets.QWidget):
         usd_logo_icon = QtGui.QPixmap(usd_logo_icon_path)
         self.usd_logo.setPixmap(usd_logo_icon)
 
+        # set default values for variables
         self.ascending_order = True
         self.alpha_sort_clicked = False
-
         self.start_label.setVisible(True)
         self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
@@ -136,31 +138,18 @@ class ProjectManager(QtWidgets.QWidget):
         self.ref_btn.setEnabled(False)
         self.home_btn.setEnabled(False)
         self.import_btn.setEnabled(False)
-
         self.usd_label.setVisible(False)
         self.usda_label.setVisible(False)
         self.usdc_label.setVisible(False)
-
         self.show_reset_popup = True
-
         self.enter_pressed_on_search_bar = False
         self.scene_list.mousePressEvent = self.mousePressEvent
         self.scene_list.keyPressEvent = self.keyPressEvent
 
+        # Initialize the panel
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(self.ui)
         self.setLayout(main_layout)
-
-        # # Create a pane tab for the panel
-        # self.tab = hou.ui.createPinnedTab(self, 'My Panel')
-        #
-        # # Set the pane tab icon
-        # icon_path = '/Users/stu/Downloads/image2vector(4).svg'
-        # icon = QtGui.QIcon(icon_path)
-        # hou.ui.setPaneTabType(self.tab, hou.ui.paneTabType.Pinned)
-        # hou.ui.setPaneTabIcon(self.tab, icon)
-
-        # reload current python panel interface
 
     def import_button(self):
         self.selected_usd = self.scene_list.currentItem()
