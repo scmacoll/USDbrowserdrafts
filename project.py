@@ -6,6 +6,7 @@ from PySide2.QtGui import QKeySequence
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
 
+
 class Node:
     def __init__(self, path):
         self.path = path
@@ -62,6 +63,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
         self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.fwd_btn = self.ui.findChild(QtWidgets.QPushButton, 'fwdbtn')
+        self.sort_btn = self.ui.findChild(QtWidgets.QPushButton, 'sortbtn')
         self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
         self.alpha_sort = self.ui.findChild(QtWidgets.QPushButton, 'sortbtn')
         self.home_btn = self.ui.findChild(QtWidgets.QPushButton, 'homebtn')
@@ -89,15 +91,18 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
         self.fwd_btn.clicked.connect(self.redo_click_forward)
-        self.alpha_sort.clicked.connect(self.sort_button)
+        self.scene_list.doubleClicked.connect(self.double_click_forward)
+        self.sort_btn.clicked.connect(self.sort_button)
         self.ref_btn.clicked.connect(self.refresh_button)
         self.home_btn.clicked.connect(self.home_button)
+        self.search_bar.textChanged.connect(self.search_directories)
         self.import_btn.clicked.connect(self.import_button)
         self.reset_btn.clicked.connect(self.reset_button)
-        self.scene_list.doubleClicked.connect(self.double_click_forward)
-        self.search_bar.textChanged.connect(self.search_directories)
 
         # set icons for UI elements
+        usd_logo_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
+        usd_logo_icon = QtGui.QPixmap(usd_logo_icon_path)
+        self.usd_logo.setPixmap(usd_logo_icon)
         back_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                          '/back.svg'
         back_icon = QtGui.QIcon(back_icon_path)
@@ -106,6 +111,10 @@ class ProjectManager(QtWidgets.QWidget):
                         '/forward.svg'
         fwd_icon = QtGui.QIcon(fwd_icon_path)
         self.fwd_btn.setIcon(fwd_icon)
+        sort_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
+                         '/adaptpixelrange.svg'
+        sort_icon = QtGui.QIcon(sort_icon_path)
+        self.sort_btn.setIcon(sort_icon)
         ref_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                         '/reload.svg'
         ref_icon = QtGui.QIcon(ref_icon_path)
@@ -114,39 +123,35 @@ class ProjectManager(QtWidgets.QWidget):
                          '/home.svg'
         home_icon = QtGui.QIcon(home_icon_path)
         self.home_btn.setIcon(home_icon)
-        alpha_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
-                          '/adaptpixelrange.svg'
-        alpha_icon = QtGui.QIcon(alpha_icon_path)
-        self.alpha_sort.setIcon(alpha_icon)
         set_proj_icon_path = \
             '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder' \
             '.svg'
         set_proj_icon = QtGui.QIcon(set_proj_icon_path)
         self.set_proj.setIcon(set_proj_icon)
-        usd_logo_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
-        usd_logo_icon = QtGui.QPixmap(usd_logo_icon_path)
-        self.usd_logo.setPixmap(usd_logo_icon)
 
         # set default values for variables
-        self.ascending_order = True
-        self.alpha_sort_clicked = False
-        self.init_label.setVisible(True)
-        self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
-        self.alpha_sort.setEnabled(False)
+        self.sort_btn.setEnabled(False)
+        self.ascending_order = True
+        self.sort_btn_clicked = False
         self.ref_btn.setEnabled(False)
+        self.search_bar.setVisible(False)
+        self.enter_pressed_on_search_bar = False
         self.home_btn.setEnabled(False)
-        self.import_btn.setEnabled(False)
+        self.init_label.setVisible(True)
         self.usd_label.setVisible(False)
         self.usda_label.setVisible(False)
         self.usdc_label.setVisible(False)
-        self.show_reset_popup = True
-        self.enter_pressed_on_search_bar = False
         self.current_node.subdirs_present = False
+        self.import_btn.setEnabled(False)
+        self.show_reset_popup = True
 
-        # self.scene_list.mousePressEvent = self.mousePressEvent
-        # self.scene_list.keyPressEvent = self.keyPressEvent
+        # set fonts for UI elements
+        self.default_font = QtGui.QFont("Consolas", 12)
+        self.usd_font = QtGui.QFont("Consolas", 13, QtGui.QFont.Normal, True)
+        self.comment_font = QtGui.QFont("TerminessTTF Nerd Font Mono", 12,
+                                   QtGui.QFont.Bold)
 
         # Initialize the panel
         main_layout = QtWidgets.QVBoxLayout()
@@ -155,52 +160,102 @@ class ProjectManager(QtWidgets.QWidget):
 
 # Project-related methods
     def set_project(self):
-        set_job = hou.ui.selectFile(title='Select Project Folder',
-                                    file_type=hou.fileType.Directory)
+        set_job = hou.ui.selectFile(
+            title='Select Project Folder', file_type=hou.fileType.Directory)
+        # sets the JOB environment variable
         hou.hscript('setenv JOB=' + set_job)
-        self.proj = hou.getenv('JOB')
 
+        self.proj = hou.getenv('JOB')
         self.tree = Tree(self.proj)
         self.current_node = self.tree.root
         self.tree.add_path(self.proj)
 
         # Set QtLabel Content
         proj_name = '  USD Project:  ' + set_job.split('/')[-2]
-        dir_name, base_name = os.path.split(set_job)
-        before_dir_name, last_path_name = os.path.split(dir_name)
+        self.proj_name.setText(proj_name)
+        abs_job_path, end_slash = os.path.split(set_job)
+        before_dir_name, last_path_name = os.path.split(abs_job_path)
         job_label = 'JOB:  ' + before_dir_name + '/' + '<b>' + \
                     last_path_name + '</b>'
-        self.proj_name.setText(proj_name)
         self.job_path.setText(job_label)
-        self.last_path_name = last_path_name
-        self.base = os.path.basename(self.current_node.path.rstrip('/'))
+        self.base_path = os.path.basename(self.current_node.path.rstrip('/'))
 
         #  Create a Node Instance
         self.current_node = self.tree.root
 
-        self.comment_text(comment="")
-        self.update_scene_list()
+        # self.usd_font = QtGui.QFont("Consolas", 13, QtGui.QFont.Normal, True)
 
-    def update_scene_list(self):
-        self.scene_list.clear()
-
-        usd_font = QtGui.QFont("Consolas", 13, QtGui.QFont.Normal, True)
-
+        self.back_btn.setEnabled(True)
+        self.fwd_btn.setEnabled(True)
+        self.sort_btn.setEnabled(True)
+        self.ref_btn.setEnabled(True)
+        self.home_btn.setEnabled(True)
+        self.search_bar.setVisible(True)
         self.init_label.setVisible(False)
         self.usd_label.setVisible(True)
         self.usda_label.setVisible(True)
         self.usdc_label.setVisible(True)
-        self.usd_label.setFont(usd_font)
-        self.usda_label.setFont(usd_font)
-        self.usdc_label.setFont(usd_font)
+        self.usd_label.setFont(self.usd_font)
+        self.usda_label.setFont(self.usd_font)
+        self.usdc_label.setFont(self.usd_font)
+        self.import_btn.setEnabled(True)
 
+        self.comment_text(comment="")
+        self.update_scene_list()
+
+    def reset_project(self):
+        self.tree = Tree()
+        self.current_node = self.tree.root
+        self.back_stack.clear()
+        self.proj = None
+
+        self.proj_name.setText(self.default_proj_name)
+        self.proj_path.setText(self.default_proj_path)
+        self.job_path.setText(self.default_job_path)
+        self.search_bar.installEventFilter(self)
+
+        self.ascending_order = True
+        self.sort_btn_clicked = False
+
+        self.init_label.setVisible(True)
+        self.search_bar.setVisible(False)
+        self.back_btn.setEnabled(False)
+        self.fwd_btn.setEnabled(False)
+        self.sort_btn.setEnabled(False)
+        self.ref_btn.setEnabled(False)
+        self.home_btn.setEnabled(False)
+        self.import_btn.setEnabled(False)
+
+        self.usd_label.setVisible(False)
+        self.usda_label.setVisible(False)
+        self.usdc_label.setVisible(False)
+
+        comment = ""
+        self.comment_text(comment)
+
+        self.scene_list.clear()
+
+# Update List Ordered Methods
+    def update_scene_list(self):
+        self.scene_list.clear()
+        self.remove_extra_fwd_slash()
+        return self.scene_list
+
+    def remove_extra_fwd_slash(self):
+        self.current_node.path = self.current_node.path + '/'
+        if self.current_node.path[-2:] == '//':
+            self.current_node.path = self.current_node.path[:-1]
+
+        self.set_path_label()
+
+    def set_path_label(self):
         # Set `Path` Label to current path
         normalized_path = Path(str(self.current_node.path)).resolve()
         path_parts = normalized_path.parts
         try:
-            base_idx = path_parts.index(self.base)
+            base_idx = path_parts.index(self.base_path)
         except ValueError:
-            raise ValueError(f"{self.base} not found in "
+            raise ValueError(f"{self.base_path} not found in "
                              f"{str(self.current_node.path)}")
         selected_path_parts = path_parts[base_idx:]
         resulting_path = Path(*selected_path_parts)
@@ -209,62 +264,52 @@ class ProjectManager(QtWidgets.QWidget):
         formatted_path = Path(first_part, *rest_parts)
         self.proj_path.setText('Path:  ' + str(formatted_path) + '/')
 
-        # self.resulting_path = resulting_path
+        self.sort_list_dir_data()
 
-        if self.proj:
-            self.back_btn.setEnabled(True)
-            self.fwd_btn.setEnabled(True)
-            self.search_bar.setVisible(True)
-            self.alpha_sort.setEnabled(True)
-            self.ref_btn.setEnabled(True)
-            self.home_btn.setEnabled(True)
-            self.import_btn.setEnabled(True)
-
-        self.current_node.path = self.current_node.path + '/'
-        if self.current_node.path[-2:] == '//':
-            self.current_node.path = self.current_node.path[:-1]
-
-        # print("current node:    " + str(self.current_node))
-        # print("node path:    " + self.current_node.path)
-        # print("node children []:    " + str(self.current_node.children))
-
-        items = os.listdir(self.current_node.path)
-        self.items = items
+    def sort_list_dir_data(self):
+        self.items = os.listdir(self.current_node.path)
         self.sorted_items = []
-        self.usd_items = []
-        self.non_usd_items = []
+        self.sorted_items_index = 0
 
-        font = QtGui.QFont("Consolas", 12)
-        max_usda_width = 0
-        max_usdc_width = 0
-        usd_file_count = 0
-        usda_file_count = 0
-        usdc_file_count = 0
+        for file in self.items:
+            self.path = os.path.join(self.current_node.path, file)
+            if os.path.isdir(self.path):
+                self.sorted_items.append(file)
+            self.sorted_items.sort()
+            if self.sort_btn_clicked:
+                self.sort_items()
+
+        for i in range(len(self.items)):
+            if self.items[i] in self.sorted_items:
+                self.items[i] = self.sorted_items[self.sorted_items_index]
+                self.sorted_items_index += 1
+
+        self.set_usd_labels()
+
+    def set_usd_labels(self):
+        self.usd_file_count = 0
+        self.usda_file_count = 0
+        self.usdc_file_count = 0
         usd_file_present = False
         usda_file_present = False
         usdc_file_present = False
 
-        # grab total values of current node
-        for file in self.items:
-            path = os.path.join(self.current_node.path, file)
-            if os.path.isdir(path):
-                self.sorted_items.append(file)
-            for root, dirs, files in os.walk(path):
-                for filename in files:
-                    if filename.endswith('.usd'):
-                        usd_file_count += 1
-                    if filename.endswith('.usda'):
-                        usda_file_count += 1
-                    if filename.endswith('.usdc'):
-                        usdc_file_count += 1
-            max_usda_width = max(max_usda_width, len(str(usda_file_count)))
-            max_usdc_width = max(max_usdc_width, len(str(usdc_file_count)))
+        for root, dirs, files in os.walk(self.path):
+            for filename in files:
+                if filename.endswith('.usd'):
+                    self.usd_file_count += 1
+                if filename.endswith('.usda'):
+                    self.usda_file_count += 1
+                if filename.endswith('.usdc'):
+                    self.usdc_file_count += 1
 
         # Set visibility & width of usda/usdc labels
-        if usd_file_count > 0 or usda_file_count > 0 or usdc_file_count > 0:
-            usd_file_present = usd_file_count > 0
-            usda_file_present = usda_file_count > 0
-            usdc_file_present = usdc_file_count > 0
+        if self.usd_file_count > 0 or self.usda_file_count > 0 or \
+                self.usdc_file_count \
+                > 0:
+            usd_file_present = self.usd_file_count > 0
+            usda_file_present = self.usda_file_count > 0
+            usdc_file_present = self.usdc_file_count > 0
 
         if usd_file_present and usda_file_present and usdc_file_present:
             self.usd_label.setText("usd")
@@ -299,168 +344,166 @@ class ProjectManager(QtWidgets.QWidget):
             self.usda_label.setText("")
             self.usdc_label.setText("usdc")
 
-        self.sorted_items.sort()
+        self.layout_items(self.items)
 
-        if self.alpha_sort_clicked:
-            self.sort_items()
+    def layout_items(self, items):
+        self.usd_items = []
+        self.non_usd_items = []
 
-        # Replace duplicates in the original list with items from the sorted
-        # list
-        self.sorted_items_index = 0
-        for i in range(len(self.items)):
-            if self.items[i] in self.sorted_items:
-                self.items[i] = self.sorted_items[self.sorted_items_index]
-                self.sorted_items_index += 1
-
-        # get all usd files in current node & subdirs
         for file in items:
             path = os.path.join(self.current_node.path, file)
-            if os.path.isdir(path):  # if item is a directory
-                usd_file_count = 0
-                usda_file_count = 0
-                usdc_file_count = 0
-                for root, dirs, files in os.walk(path):
-                    for filename in files:
-                        if filename.endswith('.usd'):
-                            usd_file_count += 1
-                        elif filename.endswith('.usda'):
-                            usda_file_count += 1
-                        elif filename.endswith('.usdc'):
-                            usdc_file_count += 1
+            if os.path.isdir(path):
+                self.layout_non_usd_items(file, path)
+            else:
+                self.layout_usd_items(file)
 
-                usda_str_length = len(str(usda_file_count))
-                usdc_str_length = len(str(usdc_file_count))
-                usda_padding = '&nbsp;' * (4 - usda_str_length)
-                usdc_padding = '&nbsp;' * (4 - usdc_str_length)
-                end_space_1 = '&nbsp;'
-                end_space_4 = '&nbsp;' * 4
+        self.add_layout_items()
 
-                if usd_file_count == 0 and usda_file_count == 0 and usdc_file_count == 0:
-                    usd_file_count = '&nbsp;' * 3
-                    usda_file_count = '&nbsp;' * 3
-                    usdc_file_count = '&nbsp;' * 3
-                    item_text = f"<font color='#36C3F1'>" \
-                                f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>" \
-                                f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"{usdc_file_count}</font>{end_space_1}"
-                elif usd_file_count == 0 and usda_file_count == 0:
-                    usd_file_count = '&nbsp;' * 3
-                    usda_file_count = '&nbsp;' * 3
-                    item_text = f"<font color='#36C3F1'>" \
-                                f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>" \
-                                f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"({usdc_file_count})</font>{end_space_1}"
-                elif usd_file_count == 0 and usdc_file_count == 0:
-                    usd_file_count = '&nbsp;' * 3
-                    usdc_file_count = '&nbsp;' * 3
-                    item_text = f"<font color='#36C3F1'>" \
-                                f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>(" \
-                                f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"{usdc_file_count}</font>{end_space_1}"
-                elif usda_file_count == 0 and usdc_file_count == 0:
-                    usda_file_count = '&nbsp;' * 3
-                    usdc_file_count = '&nbsp;' * 3
-                    item_text = f"<font color='#36C3F1'>(" \
-                                f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>" \
-                                f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"{usdc_file_count}</font>{end_space_1}"
-                elif usd_file_count == 0:
-                    usd_file_count = '&nbsp;' * 3
-                    item_text = f"<font color='#36C3F1'>" \
-                                f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>(" \
-                                f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"({usdc_file_count})</font>{end_space_1}"
-                elif usda_file_count == 0:
-                    usda_file_count = '&nbsp;' * 3
-                    item_text = f"<font color='#36C3F1'>(" \
-                                f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>" \
-                                f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"({usdc_file_count})</font>{end_space_1}"
-                elif usdc_file_count == 0:
-                    usdc_file_count = '&nbsp;' * 3
-                    item_text = f"<font color='#36C3F1'>(" \
-                                f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>(" \
-                                f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"{usdc_file_count}</font>{end_space_1}"
-                else:
-                    item_text = f"<font color='#36C3F1'>(" \
-                                f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
-                                f"<font color='#1F8ECD'>(" \
-                                f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
-                                f"<font color='#5DAADA'>" \
-                                f"({usdc_file_count})</font>{end_space_1}"
+    def layout_non_usd_items(self, file, path):
+        usd_file_count = 0
+        usda_file_count = 0
+        usdc_file_count = 0
+        for root, dirs, files in os.walk(path):
+            for filename in files:
+                if filename.endswith('.usd'):
+                    usd_file_count += 1
+                elif filename.endswith('.usda'):
+                    usda_file_count += 1
+                elif filename.endswith('.usdc'):
+                    usdc_file_count += 1
 
-                item = QtWidgets.QListWidgetItem(f"{file}")
+        # Column spacing of USD values
+        usda_str_length = len(str(usda_file_count))
+        usdc_str_length = len(str(usdc_file_count))
+        usda_padding = '&nbsp;' * (4 - usda_str_length)
+        usdc_padding = '&nbsp;' * (4 - usdc_str_length)
+        end_space_1 = '&nbsp;'
+        end_space_4 = '&nbsp;' * 4
 
-                item_widget = QtWidgets.QWidget()
+        if usd_file_count == 0 and usda_file_count == 0 and usdc_file_count == 0:
+            usd_file_count = '&nbsp;' * 3
+            usda_file_count = '&nbsp;' * 3
+            usdc_file_count = '&nbsp;' * 3
+            item_text = f"<font color='#36C3F1'>" \
+                        f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>" \
+                        f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"{usdc_file_count}</font>{end_space_1}"
+        elif usd_file_count == 0 and usda_file_count == 0:
+            usd_file_count = '&nbsp;' * 3
+            usda_file_count = '&nbsp;' * 3
+            item_text = f"<font color='#36C3F1'>" \
+                        f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>" \
+                        f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"({usdc_file_count})</font>{end_space_1}"
+        elif usd_file_count == 0 and usdc_file_count == 0:
+            usd_file_count = '&nbsp;' * 3
+            usdc_file_count = '&nbsp;' * 3
+            item_text = f"<font color='#36C3F1'>" \
+                        f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>(" \
+                        f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"{usdc_file_count}</font>{end_space_1}"
+        elif usda_file_count == 0 and usdc_file_count == 0:
+            usda_file_count = '&nbsp;' * 3
+            usdc_file_count = '&nbsp;' * 3
+            item_text = f"<font color='#36C3F1'>(" \
+                        f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>" \
+                        f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"{usdc_file_count}</font>{end_space_1}"
+        elif usd_file_count == 0:
+            usd_file_count = '&nbsp;' * 3
+            item_text = f"<font color='#36C3F1'>" \
+                        f"{usd_file_count}</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>(" \
+                        f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"({usdc_file_count})</font>{end_space_1}"
+        elif usda_file_count == 0:
+            usda_file_count = '&nbsp;' * 3
+            item_text = f"<font color='#36C3F1'>(" \
+                        f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>" \
+                        f"{usda_file_count}</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"({usdc_file_count})</font>{end_space_1}"
+        elif usdc_file_count == 0:
+            usdc_file_count = '&nbsp;' * 3
+            item_text = f"<font color='#36C3F1'>(" \
+                        f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>(" \
+                        f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"{usdc_file_count}</font>{end_space_1}"
+        else:
+            item_text = f"<font color='#36C3F1'>(" \
+                        f"{usd_file_count})</font>{usda_padding}{end_space_4}" \
+                        f"<font color='#1F8ECD'>(" \
+                        f"{usda_file_count})</font>{usdc_padding}{end_space_4}" \
+                        f"<font color='#5DAADA'>" \
+                        f"({usdc_file_count})</font>{end_space_1}"
 
-                item_label = QtWidgets.QLabel(item_text)
-                item_label.setAlignment(QtCore.Qt.AlignRight)
-                item_label.setFont(font)
+        item = QtWidgets.QListWidgetItem(f"{file}")
+        item_widget = QtWidgets.QWidget()
+        item_label = QtWidgets.QLabel(item_text)
+        item_label.setAlignment(QtCore.Qt.AlignRight)
+        item_label.setFont(self.default_font)
+        item_layout = QtWidgets.QHBoxLayout(item_widget)
+        item_layout.setContentsMargins(0, 0, 0, 0)
+        item_layout.addWidget(item_label)
 
-                item_layout = QtWidgets.QHBoxLayout(item_widget)
-                item_layout.setContentsMargins(0, 0, 0, 0)
-                item_layout.addWidget(item_label)
+        self.non_usd_items.append((item, item_widget))
+        self.tree.add_path(path + '/')
+        self.tree.node = self.current_node
+        self.current_node.subdirs_present = True
 
-                self.non_usd_items.append((item, item_widget))
+    def layout_usd_items(self, file):
+        if file.endswith('.usd'):
+            list_widget = QtWidgets.QListWidget()
+            file = QtWidgets.QListWidgetItem(file)
+            file.setForeground(QtGui.QColor('#36C3F1'))
 
-                self.tree.add_path(path + '/')  # sequential paths added
-                self.tree.node = self.current_node
-                self.current_node.subdirs_present = True
+            list_widget.addItem(file.text())
+            self.usd_items.append(file)
+            self.usd_items.sort()
 
-            elif file.endswith('.usd'):
-                list_widget = QtWidgets.QListWidget()
-                file = QtWidgets.QListWidgetItem(file)
-                file.setForeground(QtGui.QColor('#36C3F1'))
+            self.usd_font.setOverline(True)
+            self.usd_label.setText("usd")
+            self.usd_label.setFont(self.usd_font)
 
-                list_widget.addItem(file.text())
-                self.usd_items.append(file)
-                self.usd_items.sort()
+        elif file.endswith('.usda'):
+            list_widget = QtWidgets.QListWidget()
+            file = QtWidgets.QListWidgetItem(file)
+            file.setForeground(QtGui.QColor('#1F8ECD'))
 
-                usd_font.setOverline(True)
-                self.usd_label.setText("usd")
-                self.usd_label.setFont(usd_font)
+            list_widget.addItem(file.text())
+            self.usd_items.append(file)
+            self.usd_items.sort()
 
-            elif file.endswith('.usda'):
-                list_widget = QtWidgets.QListWidget()
-                file = QtWidgets.QListWidgetItem(file)
-                file.setForeground(QtGui.QColor('#1F8ECD'))
+            self.usd_font.setOverline(True)
+            self.usda_label.setText("usda")
+            self.usda_label.setFont(self.usd_font)
 
-                list_widget.addItem(file.text())
-                self.usd_items.append(file)
-                self.usd_items.sort()
+        elif file.endswith('.usdc'):
+            list_widget = QtWidgets.QListWidget()
+            file = QtWidgets.QListWidgetItem(file)
+            file.setForeground(QtGui.QColor('#5DAADA'))
 
-                usd_font.setOverline(True)
-                self.usda_label.setText("usda")
-                self.usda_label.setFont(usd_font)
+            list_widget.addItem(file.text())
+            self.usd_items.append(file)
+            self.usd_items.sort()
 
-            elif file.endswith('.usdc'):
-                list_widget = QtWidgets.QListWidget()
-                file = QtWidgets.QListWidgetItem(file)
-                file.setForeground(QtGui.QColor('#5DAADA'))
+            self.usd_font.setOverline(True)
+            self.usdc_label.setText("usdc")
+            self.usdc_label.setFont(self.usd_font)
 
-                list_widget.addItem(file.text())
-                self.usd_items.append(file)
-                self.usd_items.sort()
-
-                usd_font.setOverline(True)
-                self.usdc_label.setText("usdc")
-                self.usdc_label.setFont(usd_font)
-
+    def add_layout_items(self):
         # Add the non-usd items first
         for item, item_widget in self.non_usd_items:
             self.scene_list.addItem(item)
@@ -494,42 +537,6 @@ class ProjectManager(QtWidgets.QWidget):
         for item in self.usd_items:
             self.scene_list.addItem(item)
 
-        print(len(self.back_stack))
-
-        return self.scene_list
-
-    def reset_project(self):
-        self.tree = Tree()
-        self.current_node = self.tree.root
-        self.back_stack.clear()
-        self.proj = None
-
-        self.proj_name.setText(self.default_proj_name)
-        self.proj_path.setText(self.default_proj_path)
-        self.job_path.setText(self.default_job_path)
-        self.search_bar.installEventFilter(self)
-
-        self.ascending_order = True
-        self.alpha_sort_clicked = False
-
-        self.init_label.setVisible(True)
-        self.search_bar.setVisible(False)
-        self.back_btn.setEnabled(False)
-        self.fwd_btn.setEnabled(False)
-        self.alpha_sort.setEnabled(False)
-        self.ref_btn.setEnabled(False)
-        self.home_btn.setEnabled(False)
-        self.import_btn.setEnabled(False)
-
-        self.usd_label.setVisible(False)
-        self.usda_label.setVisible(False)
-        self.usdc_label.setVisible(False)
-
-        comment = ""
-        self.comment_text(comment)
-
-        self.scene_list.clear()
-
 # Button-related methods
     def reset_button(self):
         if self.show_reset_popup:
@@ -560,20 +567,20 @@ class ProjectManager(QtWidgets.QWidget):
         comment = "  refreshed directory!"
         self.comment_text(comment)
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
 
     def home_button(self):
         self.current_node.path = self.proj
         self.back_stack.clear()
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
         comment = "  returned to JOB!"
         self.comment_text(comment)
 
     def sort_button(self):
-        self.alpha_sort_clicked = True
+        self.sort_btn_clicked = True
         self.update_scene_list()
 
     def back_button(self):
@@ -595,7 +602,7 @@ class ProjectManager(QtWidgets.QWidget):
             print("going back to:    " + self.current_node.path)
 
             self.ascending_order = True
-            self.alpha_sort_clicked = False
+            self.sort_btn_clicked = False
             self.update_scene_list()
 
     def forward_button(self):
@@ -622,7 +629,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.current_node.path = os.path.join(
             self.current_node.path + selected_item.text())
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
 
         self.comment_text(comment="")
@@ -681,8 +688,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.comment_text(comment="")
 
     def comment_text(self, comment):
-        font = QtGui.QFont("TerminessTTF Nerd Font Mono", 12, QtGui.QFont.Bold)
-        self.cmt_label.setFont(font)
+        self.cmt_label.setFont(self.comment_font)
         self.cmt_label.setText(comment)
         palette = self.cmt_label.palette()
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor("#C5C5C5"))
@@ -709,7 +715,7 @@ class ProjectManager(QtWidgets.QWidget):
                 return
 
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
 
     def double_click_forward(self):
