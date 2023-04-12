@@ -63,7 +63,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.fwd_btn = self.ui.findChild(QtWidgets.QPushButton, 'fwdbtn')
         self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
-        self.alpha_sort = self.ui.findChild(QtWidgets.QPushButton, 'alphasort')
+        self.alpha_sort = self.ui.findChild(QtWidgets.QPushButton, 'sortbtn')
         self.home_btn = self.ui.findChild(QtWidgets.QPushButton, 'homebtn')
         self.import_btn = self.ui.findChild(QtWidgets.QPushButton, 'importbtn')
         self.reset_btn = self.ui.findChild(QtWidgets.QPushButton, 'resetbtn')
@@ -77,7 +77,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.usd_label = self.ui.findChild(QtWidgets.QLabel, 'usdlbl')
         self.usda_label = self.ui.findChild(QtWidgets.QLabel, 'usdalbl')
         self.usdc_label = self.ui.findChild(QtWidgets.QLabel, 'usdclbl')
-        self.init_label = self.ui.findChild(QtWidgets.QLabel, 'startlbl')
+        self.init_label = self.ui.findChild(QtWidgets.QLabel, 'initlbl')
 
         # set default text values for UI elements
         self.default_proj_name = self.proj_name.text()
@@ -178,8 +178,8 @@ class ProjectManager(QtWidgets.QWidget):
         #  Create a Node Instance
         self.current_node = self.tree.root
 
-        self.update_scene_list()
         self.comment_text(comment="")
+        self.update_scene_list()
 
     def update_scene_list(self):
         self.scene_list.clear()

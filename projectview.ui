@@ -175,7 +175,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCommandLinkButton" name="alphasort">
+        <widget class="QCommandLinkButton" name="sortbtn">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -359,7 +359,7 @@
         </spacer>
        </item>
        <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="startlbl">
+        <widget class="QLabel" name="initlbl">
          <property name="text">
           <string>Set a USD Project to Begin</string>
          </property>
