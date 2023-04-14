@@ -235,7 +235,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         self.scene_list.clear()
 
-# Update List Ordered Methods
+# Update List Sequential Methods
     def update_scene_list(self):
         self.scene_list.clear()
         self.remove_extra_fwd_slash()
