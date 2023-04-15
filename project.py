@@ -614,19 +614,25 @@ class ProjectManager(QtWidgets.QWidget):
     def forward_button(self):
         selected_item = self.scene_list.currentItem()
 
-        if selected_item is not None and os.path.isdir(os.path.join(
-                self.current_node.path, selected_item.text())):
-            selected_path = os.path.join(
-                self.current_node.path, selected_item.text())
+        if selected_item is None:
+            self.comment_text(comment="")
+            return
+
+        selected_path = os.path.join(self.current_node.path,
+                                     selected_item.text())
+
+        if os.path.isdir(selected_path):
             self.back_stack.clear()
+
             for child in self.current_node.children:
                 if child.path == selected_path:
                     self.current_node = child
                     self.update_scene_list()
-                    break
-            self.comment_text(comment="")
-        elif selected_item is not None \
-                and selected_item.text().endswith(('.usda', '.usdc')):
+                    self.comment_text(comment="")
+                    return
+
+        elif selected_item.text().endswith(('.usda', '.usdc')):
+            self.comment_text(comment="can only navigate to directories!")
             return
         else:
             self.comment_text(comment="")
@@ -637,7 +643,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.ascending_order = True
         self.alpha_sort_clicked = False
         self.update_scene_list()
-
         self.comment_text(comment="")
 
     def import_button(self):
