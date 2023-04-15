@@ -38,11 +38,9 @@ class Tree:
 class ProjectManager(QtWidgets.QWidget):
     def __init__(self):
         super(ProjectManager, self).__init__()
-
-        # Set up data structures
+        # Set data structures
         self.tree = Tree()
         self.current_node = self.tree.root
-        # print("    REFRESH    ")
         self.back_stack = []
 
         # Load QtDesigner UI file
@@ -137,9 +135,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.enter_pressed_on_search_bar = False
         self.current_node.subdirs_present = False
 
-        # self.scene_list.mousePressEvent = self.mousePressEvent
-        # self.scene_list.keyPressEvent = self.keyPressEvent
-
         # Initialize the panel
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(self.ui)
@@ -151,10 +146,11 @@ class ProjectManager(QtWidgets.QWidget):
                                     file_type=hou.fileType.Directory)
         hou.hscript('setenv JOB=' + set_job)
         self.proj = hou.getenv('JOB')
-
         self.tree = Tree(self.proj)
         self.current_node = self.tree.root
+        self.base = os.path.basename(self.current_node.path.rstrip('/'))
         self.tree.add_path(self.proj)
+        self.current_node = self.tree.root
 
         # Set QtLabel Content
         proj_name = '  USD Project:  ' + set_job.split('/')[-2]
@@ -163,12 +159,8 @@ class ProjectManager(QtWidgets.QWidget):
         job_label = 'JOB:  ' + before_dir_name + '/' + '<b>' + \
                     last_path_name + '</b>'
         self.proj_name.setText(proj_name)
-        self.job_path.setText(job_label)
         self.last_path_name = last_path_name
-        self.base = os.path.basename(self.current_node.path.rstrip('/'))
-
-        #  Create a Node Instance
-        self.current_node = self.tree.root
+        self.job_path.setText(job_label)
 
         self.comment_text(comment="")
         self.update_scene_list()
@@ -200,8 +192,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.usda_label.setVisible(False)
         self.usdc_label.setVisible(False)
 
-        comment = ""
-        self.comment_text(comment)
+        self.comment_text(comment= "")
 
         self.scene_list.clear()
 
@@ -218,6 +209,12 @@ class ProjectManager(QtWidgets.QWidget):
         return self.scene_list
 
     def set_ui(self):
+        self.back_btn.setEnabled(True)
+        self.fwd_btn.setEnabled(True)
+        self.alpha_sort.setEnabled(True)
+        self.ref_btn.setEnabled(True)
+        self.home_btn.setEnabled(True)
+        self.search_bar.setVisible(True)
         self.init_label.setVisible(False)
         self.usd_label.setVisible(True)
         self.usda_label.setVisible(True)
@@ -226,12 +223,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.usd_label.setFont(self.usd_font)
         self.usda_label.setFont(self.usd_font)
         self.usdc_label.setFont(self.usd_font)
-        self.back_btn.setEnabled(True)
-        self.fwd_btn.setEnabled(True)
-        self.search_bar.setVisible(True)
-        self.alpha_sort.setEnabled(True)
-        self.ref_btn.setEnabled(True)
-        self.home_btn.setEnabled(True)
         self.import_btn.setEnabled(True)
 
     def set_path_label(self):
@@ -298,7 +289,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         # Set visibility of usd labels
         if self.usd_file_count > 0 or self.usda_file_count > 0 \
-            or self.usdc_file_count > 0:
+                or self.usdc_file_count > 0:
             usd_file_present = self.usd_file_count > 0
             usda_file_present = self.usda_file_count > 0
             usdc_file_present = self.usdc_file_count > 0
@@ -308,37 +299,37 @@ class ProjectManager(QtWidgets.QWidget):
             self.usda_label.setText("usda")
             self.usdc_label.setText("usdc")
         elif not usd_file_present and not usda_file_present \
-            and not usdc_file_present:
+                and not usdc_file_present:
             self.usd_label.setText("")
             self.usda_label.setText("")
             self.usdc_label.setText("")
         elif usd_file_present and usda_file_present \
-            and not usdc_file_present:
+                and not usdc_file_present:
             self.usd_label.setText("usd")
             self.usda_label.setText("usda")
             self.usdc_label.setText("")
         elif usd_file_present and not usda_file_present \
-            and usdc_file_present:
+                and usdc_file_present:
             self.usd_label.setText("usd")
             self.usda_label.setText("")
             self.usdc_label.setText("usdc")
         elif not usd_file_present and usda_file_present \
-            and usdc_file_present:
+                and usdc_file_present:
             self.usd_label.setText("")
             self.usda_label.setText("usda")
             self.usdc_label.setText("usdc")
         elif not usd_file_present and usda_file_present \
-            and not usdc_file_present:
+                and not usdc_file_present:
             self.usd_label.setText("")
             self.usda_label.setText("usda")
             self.usdc_label.setText("")
         elif usd_file_present and not usda_file_present \
-            and not usdc_file_present:
+                and not usdc_file_present:
             self.usd_label.setText("usd")
             self.usda_label.setText("")
             self.usdc_label.setText("")
         elif not usd_file_present and not usda_file_present \
-            and usdc_file_present:
+                and usdc_file_present:
             self.usd_label.setText("")
             self.usda_label.setText("")
             self.usdc_label.setText("usdc")
@@ -381,7 +372,7 @@ class ProjectManager(QtWidgets.QWidget):
         end_space_4 = '&nbsp;' * 4
         # Format USD values
         if self.usd_file_count == 0 and self.usda_file_count == 0 \
-            and self.usdc_file_count == 0:
+                and self.usdc_file_count == 0:
             self.usd_file_count = '&nbsp;' * 3
             self.usda_file_count = '&nbsp;' * 3
             self.usdc_file_count = '&nbsp;' * 3
@@ -624,7 +615,7 @@ class ProjectManager(QtWidgets.QWidget):
         selected_item = self.scene_list.currentItem()
 
         if selected_item is not None and os.path.isdir(os.path.join(
-            self.current_node.path, selected_item.text())):
+                self.current_node.path, selected_item.text())):
             selected_path = os.path.join(
                 self.current_node.path, selected_item.text())
             self.back_stack.clear()
@@ -635,7 +626,7 @@ class ProjectManager(QtWidgets.QWidget):
                     break
             self.comment_text(comment="")
         elif selected_item is not None \
-            and selected_item.text().endswith(('.usda', '.usdc')):
+                and selected_item.text().endswith(('.usda', '.usdc')):
             return
         else:
             self.comment_text(comment="")
@@ -652,7 +643,7 @@ class ProjectManager(QtWidgets.QWidget):
     def import_button(self):
         self.selected_usd = self.scene_list.currentItem()
         if self.selected_usd is not None \
-            and self.selected_usd.text().endswith(('.usda', '.usdc')):
+                and self.selected_usd.text().endswith(('.usda', '.usdc')):
             self.import_usd()
         else:
             self.comment_text(comment="can only import usd files!")
@@ -719,7 +710,7 @@ class ProjectManager(QtWidgets.QWidget):
                 node = self.back_stack.pop()
                 self.current_node.path = node
             elif len(self.back_stack) <= 0 \
-                and self.current_node.subdirs_present:
+                    and self.current_node.subdirs_present:
                 return
             elif not self.current_node.subdirs_present:
                 self.comment_text(comment="  no more subdirectories!")
@@ -790,7 +781,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         # Delete all text in search bar
         elif event.matches(QKeySequence("Ctrl+Backspace")) \
-            and self.search_bar.hasFocus():
+                and self.search_bar.hasFocus():
             self.search_bar.clear()
             super(ProjectManager, self).keyPressEvent(event)
 
