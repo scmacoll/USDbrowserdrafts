@@ -49,25 +49,25 @@ class ProjectManager(QtWidgets.QWidget):
                               '/scripts/python/projectview/projectview.ui')
 
         # get UI elements (QtDesigner)
+        self.usd_logo = self.ui.findChild(QtWidgets.QLabel, 'usdlogo')
+        self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
         self.set_proj = self.ui.findChild(QtWidgets.QPushButton, 'setproj')
+        self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
+        self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
         self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.fwd_btn = self.ui.findChild(QtWidgets.QPushButton, 'fwdbtn')
-        self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
         self.sort_btn = self.ui.findChild(QtWidgets.QPushButton, 'sortbtn')
+        self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
         self.home_btn = self.ui.findChild(QtWidgets.QPushButton, 'homebtn')
-        self.import_btn = self.ui.findChild(QtWidgets.QPushButton, 'importbtn')
-        self.reset_btn = self.ui.findChild(QtWidgets.QPushButton, 'resetbtn')
-        self.proj_path = self.ui.findChild(QtWidgets.QLabel, 'projpath')
-        self.job_path = self.ui.findChild(QtWidgets.QLabel, 'jobpath')
-        self.proj_name = self.ui.findChild(QtWidgets.QLabel, 'projname')
-        self.cmt_label = self.ui.findChild(QtWidgets.QLabel, 'cmtlbl')
-        self.usd_logo = self.ui.findChild(QtWidgets.QLabel, 'usdlogo')
-        self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
         self.search_bar = self.ui.findChild(QtWidgets.QLineEdit, 'searchbar')
+        self.init_label = self.ui.findChild(QtWidgets.QLabel, 'initlbl')
         self.usd_label = self.ui.findChild(QtWidgets.QLabel, 'usdlbl')
         self.usda_label = self.ui.findChild(QtWidgets.QLabel, 'usdalbl')
         self.usdc_label = self.ui.findChild(QtWidgets.QLabel, 'usdclbl')
-        self.init_label = self.ui.findChild(QtWidgets.QLabel, 'initlbl')
+        self.cmt_label = self.ui.findChild(QtWidgets.QLabel, 'cmtlbl')
+        self.import_btn = self.ui.findChild(QtWidgets.QPushButton, 'importbtn')
+        self.reset_btn = self.ui.findChild(QtWidgets.QPushButton, 'resetbtn')
+        self.scene_list = self.ui.findChild(QtWidgets.QListWidget, 'scenelist')
 
         # set default text values for UI elements
         self.default_proj_name = self.proj_name.text()
@@ -82,12 +82,20 @@ class ProjectManager(QtWidgets.QWidget):
         self.sort_btn.clicked.connect(self.sort_button)
         self.ref_btn.clicked.connect(self.refresh_button)
         self.home_btn.clicked.connect(self.home_button)
+        self.search_bar.textChanged.connect(self.search_directories)
+        self.scene_list.doubleClicked.connect(self.double_click_forward)
         self.import_btn.clicked.connect(self.import_button)
         self.reset_btn.clicked.connect(self.reset_button)
-        self.scene_list.doubleClicked.connect(self.double_click_forward)
-        self.search_bar.textChanged.connect(self.search_directories)
 
         # set icons for UI elements
+        usd_logo_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
+        usd_logo_icon = QtGui.QPixmap(usd_logo_icon_path)
+        self.usd_logo.setPixmap(usd_logo_icon)
+        set_proj_icon_path = \
+            '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder' \
+            '.svg'
+        set_proj_icon = QtGui.QIcon(set_proj_icon_path)
+        self.set_proj.setIcon(set_proj_icon)
         back_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                          '/back.svg'
         back_icon = QtGui.QIcon(back_icon_path)
@@ -96,6 +104,10 @@ class ProjectManager(QtWidgets.QWidget):
                         '/forward.svg'
         fwd_icon = QtGui.QIcon(fwd_icon_path)
         self.fwd_btn.setIcon(fwd_icon)
+        sort_btn_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
+                        '/adaptpixelrange.svg'
+        sort_btn = QtGui.QIcon(sort_btn_path)
+        self.sort_btn.setIcon(sort_btn)
         ref_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS' \
                         '/reload.svg'
         ref_icon = QtGui.QIcon(ref_icon_path)
@@ -104,35 +116,23 @@ class ProjectManager(QtWidgets.QWidget):
                          '/home.svg'
         home_icon = QtGui.QIcon(home_icon_path)
         self.home_btn.setIcon(home_icon)
-        sort_btn_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
-                        '/adaptpixelrange.svg'
-        sort_btn = QtGui.QIcon(sort_btn_path)
-        self.sort_btn.setIcon(sort_btn)
-        set_proj_icon_path = \
-            '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder' \
-            '.svg'
-        set_proj_icon = QtGui.QIcon(set_proj_icon_path)
-        self.set_proj.setIcon(set_proj_icon)
-        usd_logo_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
-        usd_logo_icon = QtGui.QPixmap(usd_logo_icon_path)
-        self.usd_logo.setPixmap(usd_logo_icon)
 
         # set default values for variables
-        self.ascending_order = True
-        self.sort_btn_clicked = False
-        self.init_label.setVisible(True)
-        self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
         self.sort_btn.setEnabled(False)
+        self.ascending_order = True
+        self.sort_btn_clicked = False
         self.ref_btn.setEnabled(False)
         self.home_btn.setEnabled(False)
-        self.import_btn.setEnabled(False)
+        self.search_bar.setVisible(False)
+        self.enter_pressed_on_search_bar = False
+        self.init_label.setVisible(True)
         self.usd_label.setVisible(False)
         self.usda_label.setVisible(False)
         self.usdc_label.setVisible(False)
+        self.import_btn.setEnabled(False)
         self.show_reset_popup = True
-        self.enter_pressed_on_search_bar = False
         self.current_node.subdirs_present = False
 
         # Initialise the panel
@@ -179,18 +179,17 @@ class ProjectManager(QtWidgets.QWidget):
         self.ascending_order = True
         self.sort_btn_clicked = False
 
-        self.init_label.setVisible(True)
-        self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
         self.sort_btn.setEnabled(False)
         self.ref_btn.setEnabled(False)
         self.home_btn.setEnabled(False)
-        self.import_btn.setEnabled(False)
-
+        self.search_bar.setVisible(False)
+        self.init_label.setVisible(True)
         self.usd_label.setVisible(False)
         self.usda_label.setVisible(False)
         self.usdc_label.setVisible(False)
+        self.import_btn.setEnabled(False)
 
         self.comment_text(comment= "")
 
