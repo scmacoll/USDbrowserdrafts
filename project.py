@@ -53,7 +53,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_btn = self.ui.findChild(QtWidgets.QPushButton, 'backbtn')
         self.fwd_btn = self.ui.findChild(QtWidgets.QPushButton, 'fwdbtn')
         self.ref_btn = self.ui.findChild(QtWidgets.QPushButton, 'refbtn')
-        self.alpha_sort = self.ui.findChild(QtWidgets.QPushButton, 'sortbtn')
+        self.sort_btn = self.ui.findChild(QtWidgets.QPushButton, 'sortbtn')
         self.home_btn = self.ui.findChild(QtWidgets.QPushButton, 'homebtn')
         self.import_btn = self.ui.findChild(QtWidgets.QPushButton, 'importbtn')
         self.reset_btn = self.ui.findChild(QtWidgets.QPushButton, 'resetbtn')
@@ -79,7 +79,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_btn.clicked.connect(self.back_button)
         self.fwd_btn.clicked.connect(self.forward_button)
         self.fwd_btn.clicked.connect(self.redo_click_forward)
-        self.alpha_sort.clicked.connect(self.sort_button)
+        self.sort_btn.clicked.connect(self.sort_button)
         self.ref_btn.clicked.connect(self.refresh_button)
         self.home_btn.clicked.connect(self.home_button)
         self.import_btn.clicked.connect(self.import_button)
@@ -104,10 +104,10 @@ class ProjectManager(QtWidgets.QWidget):
                          '/home.svg'
         home_icon = QtGui.QIcon(home_icon_path)
         self.home_btn.setIcon(home_icon)
-        alpha_icon_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
-                          '/adaptpixelrange.svg'
-        alpha_icon = QtGui.QIcon(alpha_icon_path)
-        self.alpha_sort.setIcon(alpha_icon)
+        sort_btn_path = '/Users/stu/Documents/3D/QtDesigner/icons/IMAGE' \
+                        '/adaptpixelrange.svg'
+        sort_btn = QtGui.QIcon(sort_btn_path)
+        self.sort_btn.setIcon(sort_btn)
         set_proj_icon_path = \
             '/Users/stu/Documents/3D/QtDesigner/icons/BUTTONS/chooser_folder' \
             '.svg'
@@ -119,12 +119,12 @@ class ProjectManager(QtWidgets.QWidget):
 
         # set default values for variables
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.init_label.setVisible(True)
         self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
-        self.alpha_sort.setEnabled(False)
+        self.sort_btn.setEnabled(False)
         self.ref_btn.setEnabled(False)
         self.home_btn.setEnabled(False)
         self.import_btn.setEnabled(False)
@@ -177,13 +177,13 @@ class ProjectManager(QtWidgets.QWidget):
         self.search_bar.installEventFilter(self)
 
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
 
         self.init_label.setVisible(True)
         self.search_bar.setVisible(False)
         self.back_btn.setEnabled(False)
         self.fwd_btn.setEnabled(False)
-        self.alpha_sort.setEnabled(False)
+        self.sort_btn.setEnabled(False)
         self.ref_btn.setEnabled(False)
         self.home_btn.setEnabled(False)
         self.import_btn.setEnabled(False)
@@ -211,7 +211,7 @@ class ProjectManager(QtWidgets.QWidget):
     def set_ui(self):
         self.back_btn.setEnabled(True)
         self.fwd_btn.setEnabled(True)
-        self.alpha_sort.setEnabled(True)
+        self.sort_btn.setEnabled(True)
         self.ref_btn.setEnabled(True)
         self.home_btn.setEnabled(True)
         self.search_bar.setVisible(True)
@@ -272,7 +272,7 @@ class ProjectManager(QtWidgets.QWidget):
 
         # Sort directories each update
         self.dir_items.sort()
-        if self.alpha_sort_clicked:
+        if self.sort_btn_clicked:
             self.sort_items()
 
         # Replace duplicate dirs in the original list with sorted dirs
@@ -577,19 +577,19 @@ class ProjectManager(QtWidgets.QWidget):
         self.back_stack.clear()
         self.comment_text(comment="  refreshed directory!")
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
 
     def home_button(self):
         self.current_node.path = self.proj
         self.back_stack.clear()
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
         self.comment_text(comment="  returned to JOB!")
 
     def sort_button(self):
-        self.alpha_sort_clicked = True
+        self.sort_btn_clicked = True
         self.update_scene_list()
 
     def back_button(self):
@@ -608,7 +608,7 @@ class ProjectManager(QtWidgets.QWidget):
             self.comment_text(comment="")
 
             self.ascending_order = True
-            self.alpha_sort_clicked = False
+            self.sort_btn_clicked = False
             self.update_scene_list()
 
     def forward_button(self):
@@ -631,7 +631,7 @@ class ProjectManager(QtWidgets.QWidget):
                     self.comment_text(comment="")
                     return
 
-        elif selected_item.text().endswith(('.usda', '.usdc')):
+        elif selected_item.text().endswith(('usd', '.usda', '.usdc')):
             self.comment_text(comment="can only navigate to directories!")
             return
         else:
@@ -641,7 +641,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.current_node.path = os.path.join(
             self.current_node.path + selected_item.text())
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
         self.comment_text(comment="")
 
@@ -735,7 +735,7 @@ class ProjectManager(QtWidgets.QWidget):
                 return
 
         self.ascending_order = True
-        self.alpha_sort_clicked = False
+        self.sort_btn_clicked = False
         self.update_scene_list()
 
     def double_click_forward(self):
