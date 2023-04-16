@@ -1,8 +1,8 @@
 import os
 import hou
 from pathlib import Path
-from PySide2.QtWidgets import QMessageBox, QCheckBox
-from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import QMessageBox, QCheckBox, QListWidgetItem
+from PySide2.QtGui import QKeySequence, QBrush, QColor
 from PySide2 import QtWidgets, QtUiTools, QtGui, QtCore
 
 
@@ -681,8 +681,21 @@ class ProjectManager(QtWidgets.QWidget):
                     self.tree.add_path(path + '/')
                     self.tree.node = self.current_node
                     self.current_node.subdirs_present = True
-                elif file.endswith('.usda') and query.lower() in file.lower():
-                    self.scene_list.addItem(file)
+                elif file.lower().endswith('.usd') \
+                        and query.lower() in file.lower():
+                    file_item = QListWidgetItem(file)
+                    file_item.setForeground(QBrush(QColor('#36C3F1')))
+                    self.scene_list.addItem(file_item)
+                elif file.lower().endswith('.usda') \
+                        and query.lower() in file.lower():
+                    file_item = QListWidgetItem(file)
+                    file_item.setForeground(QBrush(QColor('#1F8ECD')))
+                    self.scene_list.addItem(file_item)
+                elif file.lower().endswith('.usdc') \
+                        and query.lower() in file.lower():
+                    file_item = QListWidgetItem(file)
+                    file_item.setForeground(QBrush(QColor('#5DAADA')))
+                    self.scene_list.addItem(file_item)
         else:
             self.update_scene_list()
 
