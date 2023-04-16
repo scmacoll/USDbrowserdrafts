@@ -135,7 +135,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.enter_pressed_on_search_bar = False
         self.current_node.subdirs_present = False
 
-        # Initialize the panel
+        # Initialise the panel
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(self.ui)
         self.setLayout(main_layout)
