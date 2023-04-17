@@ -12,8 +12,12 @@ usd_import_output = usd_import_node.geometry()
 # Get all primitives from the USD import node
 prims = usd_import_output.prims()
 
-# Initialize a set to store unique @path attributes
+# Initialize a set to store unique @name attributes
 unique_name = set()
+
+# ! if attrib == "name":
+
+# ! elif attrib == "path":
 
 # Iterate through each primitive
 for prim in prims:
@@ -21,7 +25,7 @@ for prim in prims:
     prim_name = prim.attribValue("name")
     unique_name.add(prim_name)
 
-# Create blast nodes for each unique @path attribute
+# Create blast nodes for each unique @name attribute
 for name in unique_name:
     # Create a blast node
     blast_node = geo_node.createNode("blast")
