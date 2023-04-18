@@ -15,23 +15,66 @@ def blast_name(kwargs):
     prims = usd_import_output.prims()
 
     # Initialize a set to store unique @name attributes
-    unique_name = set()
+    unique_paths = set()
+    unique_names = set()
     prim_nodes = []
 
     attrib_value = current_node.parm("attrib").eval()
     blast_select = current_node.parm("blastselect").eval()
     path_level = current_node.parm("pathlvl").eval()
 
-    # Blast selection = Attribute, Attribute = @Name
-    if blast_select == 1 and attrib_value == 0:
+    # Blast selection: All Primitives
+    if blast_select is 0:
+        for prim in prims:
+            prim_name = prim.attribValue("name")
+            prim_path = prim.attribValue("path")
+            unique_paths.add(prim_path)
+            unique_names.add(prim_name)
+
+        num_prims = len(prims)
+
+        if len(unique_paths) is num_prims:
+            group_attrib = "path"
+            unique_values = unique_paths
+        elif len(unique_names) is num_prims:
+            group_attrib = "name"
+            unique_values = unique_names
+        else:
+            group_attrib = "prim_num"
+            unique_values = range(num_prims)
+
+        for value in unique_values:
+            prim_value = "prim_" + str(value)
+            blast_node = geo_node.createNode("blast", prim_value)
+            blast_node.setInput(0, current_node)
+
+            if group_attrib is "path":
+                blast_node.parm("group").set("@path=" + value)
+            elif group_attrib is "name":
+                blast_node.parm("group").set("@name=" + value)
+            else:
+                blast_node.parm("group").set(prim_value)
+
+            blast_node.parm("negate").set(True)
+            blast_node.parm("grouptype").set(4)
+
+            prim_nodes.append(blast_node)
+
+    # Blast selection: Group
+    elif blast_select is 2:
+
+        return
+
+    # Blast selection: Attribute, Attribute: @Name
+    elif blast_select is 1 and attrib_value is 0:
 
         for prim in prims:
             prim_name = prim.attribValue("name")
-            unique_name.add(prim_name)
+            unique_names.add(prim_name)
 
-        for name in unique_name:
+        for name in unique_names:
             # Create a blast node
-            blast_node = geo_node.createNode("blast")
+            blast_node = geo_node.createNode("blast", name)
 
             # Set the node's input to be the output of the current node
             blast_node.setInput(0, current_node)
@@ -43,7 +86,7 @@ def blast_name(kwargs):
 
             prim_nodes.append(blast_node)
     # Blast selection = Attribute, Attribute = @Path
-    elif blast_select == 1 and attrib_value == 1:
+    elif blast_select is 1 and attrib_value is 1:
 
         # Path level values
         for prim in prims:
@@ -51,15 +94,19 @@ def blast_name(kwargs):
             path_parts = prim_path.split("/")
             if len(path_parts) > path_level:
                 root_path = path_parts[1]
-                if path_level == 0:
+                if path_level is 0:
                     blast_path = '/' + root_path + '/*'
                 else:
                     blast_path = "/" + "/".join(
                         path_parts[1:path_level+2]) + "/*"
-                unique_name.add((root_path, blast_path))
+                unique_names.add((root_path, blast_path))
 
-        for path, blast_path in unique_name:
-            blast_node = geo_node.createNode("blast")
+        for path, blast_path in unique_names:
+            split_path = blast_path.split("/")
+            current_path = split_path[-2]
+            print("split_path: ", split_path)
+            print("current_path: ", current_path)
+            blast_node = geo_node.createNode("blast", current_path)
             blast_node.setInput(0, current_node)
             blast_node.parm("group").set("@path=" + blast_path)
             blast_node.parm("negate").set(True)
