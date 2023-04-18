@@ -1,3 +1,14 @@
+def merge_nodes(prim_nodes, geo_node):
+    merge_node = geo_node.createNode('merge', 'merge')
+
+    for node in prim_nodes:
+        merge_node.setNextInput(node)
+
+    geo_node.layoutChildren()
+    merge_node.setDisplayFlag(True)
+    merge_node.setRenderFlag(True)
+
+
 def blast_name(kwargs):
 
     import hou
@@ -22,12 +33,19 @@ def blast_name(kwargs):
     attrib_value = current_node.parm("attrib").eval()
     blast_select = current_node.parm("blastselect").eval()
     path_level = current_node.parm("pathlvl").eval()
+    group_param = current_node.parm("group").eval()
+    # group_param = hou.evalParm('group')
 
     # Blast selection: All Primitives
     if blast_select is 0:
         for prim in prims:
             prim_name = prim.attribValue("name")
             prim_path = prim.attribValue("path")
+
+            integers = [int(s) for s in prim_name.split() if s.isdigit()]
+            for integer in integers:
+                unique_names.add(str(integer))
+
             unique_paths.add(prim_path)
             unique_names.add(prim_name)
 
@@ -40,8 +58,8 @@ def blast_name(kwargs):
             group_attrib = "name"
             unique_values = unique_names
         else:
-            group_attrib = "prim_num"
-            unique_values = range(num_prims)
+            group_attrib = "integer"
+            unique_values = set(str(integer) for integer in range(num_prims))
 
         for value in unique_values:
             prim_value = "prim_" + str(value)
@@ -53,17 +71,33 @@ def blast_name(kwargs):
             elif group_attrib is "name":
                 blast_node.parm("group").set("@name=" + value)
             else:
-                blast_node.parm("group").set(prim_value)
+                blast_node.parm("group").set(value)
 
             blast_node.parm("negate").set(True)
             blast_node.parm("grouptype").set(4)
 
             prim_nodes.append(blast_node)
 
-    # Blast selection: Group
-    elif blast_select is 2:
+        merge_nodes(prim_nodes, geo_node)
 
-        return
+    # Blast selection: Group
+    elif blast_select is 2 and group_param is not "":
+        group_list = group_param.split(',')
+
+        for group in group_list:
+            group = group.strip()
+            if not group:
+                continue
+
+            group_name = "group_" + str(group)
+            blast_node = geo_node.createNode("blast", group_name)
+            blast_node.setInput(0, current_node)
+            blast_node.parm("group").set(group)
+            blast_node.parm("negate").set(True)
+            blast_node.parm("grouptype").set(4)
+
+            prim_nodes.append(blast_node)
+        merge_nodes(prim_nodes, geo_node)
 
     # Blast selection: Attribute, Attribute: @Name
     elif blast_select is 1 and attrib_value is 0:
@@ -85,6 +119,8 @@ def blast_name(kwargs):
             blast_node.parm("grouptype").set(4)
 
             prim_nodes.append(blast_node)
+
+        merge_nodes(prim_nodes, geo_node)
     # Blast selection = Attribute, Attribute = @Path
     elif blast_select is 1 and attrib_value is 1:
 
@@ -104,8 +140,7 @@ def blast_name(kwargs):
         for path, blast_path in unique_names:
             split_path = blast_path.split("/")
             current_path = split_path[-2]
-            print("split_path: ", split_path)
-            print("current_path: ", current_path)
+
             blast_node = geo_node.createNode("blast", current_path)
             blast_node.setInput(0, current_node)
             blast_node.parm("group").set("@path=" + blast_path)
@@ -114,14 +149,11 @@ def blast_name(kwargs):
 
             prim_nodes.append(blast_node)
 
-    merge_node = geo_node.createNode('merge', 'merge')
+        merge_nodes(prim_nodes, geo_node)
 
-    for node in prim_nodes:
-        merge_node.setNextInput(node)
+    else:
+        return
 
-    geo_node.layoutChildren()
-    merge_node.setDisplayFlag(True)
-    merge_node.setRenderFlag(True)
 
 #
 # # Get the current Python node and find its parent (the Geometry node)
