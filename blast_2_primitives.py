@@ -20,17 +20,15 @@ def blast_name(kwargs):
 
     attrib_value = current_node.parm("attrib").eval()
     blast_select = current_node.parm("blastselect").eval()
-    print("attrib_value: ", attrib_value)
-    print("blast_select: ", blast_select)
+    path_level = current_node.parm("pathlvl").eval()
 
+    # Blast selection = Attribute, Attribute = @Name
     if blast_select == 1 and attrib_value == 0:
 
         for prim in prims:
-            # Get the @path attribute
             prim_name = prim.attribValue("name")
             unique_name.add(prim_name)
 
-        # Create blast nodes for each unique @name attribute
         for name in unique_name:
             # Create a blast node
             blast_node = geo_node.createNode("blast")
@@ -44,17 +42,39 @@ def blast_name(kwargs):
             blast_node.parm("grouptype").set(4)
 
             prim_nodes.append(blast_node)
+    # Blast selection = Attribute, Attribute = @Path
+    elif blast_select == 1 and attrib_value == 1:
 
-        merge_node = geo_node.createNode('merge', 'merge')
+        # Path level values
+        for prim in prims:
+            prim_path = prim.attribValue("path")
+            path_parts = prim_path.split("/")
+            if len(path_parts) > path_level:
+                root_path = path_parts[1]
+                if path_level == 0:
+                    blast_path = '/' + root_path + '/*'
+                else:
+                    blast_path = "/" + "/".join(
+                        path_parts[1:path_level+2]) + "/*"
+                unique_name.add((root_path, blast_path))
 
-        for node in prim_nodes:
-            merge_node.setNextInput(node)
+        for path, blast_path in unique_name:
+            blast_node = geo_node.createNode("blast")
+            blast_node.setInput(0, current_node)
+            blast_node.parm("group").set("@path=" + blast_path)
+            blast_node.parm("negate").set(True)
+            blast_node.parm("grouptype").set(4)
 
-        geo_node.layoutChildren()
-        merge_node.setDisplayFlag(True)
-        merge_node.setRenderFlag(True)
+            prim_nodes.append(blast_node)
 
+    merge_node = geo_node.createNode('merge', 'merge')
 
+    for node in prim_nodes:
+        merge_node.setNextInput(node)
+
+    geo_node.layoutChildren()
+    merge_node.setDisplayFlag(True)
+    merge_node.setRenderFlag(True)
 
 #
 # # Get the current Python node and find its parent (the Geometry node)
@@ -170,3 +190,78 @@ def blast_name(kwargs):
 #
 # geo_node.layoutChildren()
 
+#  ######################################################
+
+"""
+def blast_name(kwargs):
+
+    import hou
+
+    # Get the current Python node and find its parent (the Geometry node)
+    current_node = kwargs["node"]
+    geo_node = current_node.parent()
+    # Find the first USD import node connected to the Geometry node
+    usd_import_node = current_node.input(0)
+
+    # Get the output of the USD import node
+    usd_import_output = usd_import_node.geometry()
+
+    # Get all primitives from the USD import node
+    prims = usd_import_output.prims()
+
+    # Initialize a set to store unique @name attributes
+    unique_name = set()
+    prim_nodes = []
+
+    attrib_value = current_node.parm("attrib").eval()
+    blast_select = current_node.parm("blastselect").eval()
+
+    if blast_select == 1 and attrib_value == 0:
+
+        for prim in prims:
+            prim_name = prim.attribValue("name")
+            unique_name.add(prim_name)
+
+        for name in unique_name:
+            # Create a blast node
+            blast_node = geo_node.createNode("blast")
+
+            # Set the node's input to be the output of the current node
+            blast_node.setInput(0, current_node)
+
+            # Set the group name in the blast node using the @name attribute
+            blast_node.parm("group").set("@name=" + name)
+            blast_node.parm("negate").set(True)
+            blast_node.parm("grouptype").set(4)
+
+            prim_nodes.append(blast_node)
+
+    elif blast_select == 1 and attrib_value == 1:
+
+        for prim in prims:
+            prim_name = prim.attribValue("path")
+            unique_name.add(prim_name)
+
+        for path in unique_name:
+            # Create a blast node
+            blast_node = geo_node.createNode("blast")
+
+            # Set the node's input to be the output of the current node
+            blast_node.setInput(0, current_node)
+
+            # Set the group path in the blast node using the @path attribute
+            blast_node.parm("group").set("@path=" + path)
+            blast_node.parm("negate").set(True)
+            blast_node.parm("grouptype").set(4)
+
+            prim_nodes.append(blast_node)
+
+    merge_node = geo_node.createNode('merge', 'merge')
+
+    for node in prim_nodes:
+        merge_node.setNextInput(node)
+
+    geo_node.layoutChildren()
+    merge_node.setDisplayFlag(True)
+    merge_node.setRenderFlag(True)
+"""
