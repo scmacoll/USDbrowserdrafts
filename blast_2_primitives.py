@@ -1,44 +1,61 @@
-import hou
+def blast_name(kwargs):
 
-# Get the current Python node and find its parent (the Geometry node)
-python_node = hou.pwd()
-geo_node = python_node.parent()
-# Find the first USD import node connected to the Geometry node
-usd_import_node = python_node.input(0)
+    import hou
 
-# Get the output of the USD import node
-usd_import_output = usd_import_node.geometry()
+    # Get the current Python node and find its parent (the Geometry node)
+    current_node = kwargs["node"]
+    geo_node = current_node.parent()
+    # Find the first USD import node connected to the Geometry node
+    usd_import_node = current_node.input(0)
 
-# Get all primitives from the USD import node
-prims = usd_import_output.prims()
+    # Get the output of the USD import node
+    usd_import_output = usd_import_node.geometry()
 
-# Initialize a set to store unique @name attributes
-unique_name = set()
+    # Get all primitives from the USD import node
+    prims = usd_import_output.prims()
 
-# ! if attrib == "name":
+    # Initialize a set to store unique @name attributes
+    unique_name = set()
+    prim_nodes = []
 
-# ! elif attrib == "path":
+    attrib_value = current_node.parm("attrib").eval()
+    blast_select = current_node.parm("blastselect").eval()
+    print("attrib_value: ", attrib_value)
+    print("blast_select: ", blast_select)
 
-# Iterate through each primitive
-for prim in prims:
-    # Get the @path attribute
-    prim_name = prim.attribValue("name")
-    unique_name.add(prim_name)
+    if blast_select == 1 and attrib_value == 0:
 
-# Create blast nodes for each unique @name attribute
-for name in unique_name:
-    # Create a blast node
-    blast_node = geo_node.createNode("blast")
+        for prim in prims:
+            # Get the @path attribute
+            prim_name = prim.attribValue("name")
+            unique_name.add(prim_name)
 
-    # Set the node's input to be the output of the USD import node
-    blast_node.setInput(0, usd_import_node)
+        # Create blast nodes for each unique @name attribute
+        for name in unique_name:
+            # Create a blast node
+            blast_node = geo_node.createNode("blast")
 
-    # Set the group name in the blast node using the @name attribute
-    blast_node.parm("group").set("@name=" + name)
-    blast_node.parm("negate").set(True)
-    blast_node.parm("grouptype").set(4)
+            # Set the node's input to be the output of the current node
+            blast_node.setInput(0, current_node)
 
-geo_node.layoutChildren()
+            # Set the group name in the blast node using the @name attribute
+            blast_node.parm("group").set("@name=" + name)
+            blast_node.parm("negate").set(True)
+            blast_node.parm("grouptype").set(4)
+
+            prim_nodes.append(blast_node)
+
+        merge_node = geo_node.createNode('merge', 'merge')
+
+        for node in prim_nodes:
+            merge_node.setNextInput(node)
+
+        geo_node.layoutChildren()
+        merge_node.setDisplayFlag(True)
+        merge_node.setRenderFlag(True)
+
+
+
 #
 # # Get the current Python node and find its parent (the Geometry node)
 # python_node = hou.pwd()
@@ -152,3 +169,4 @@ geo_node.layoutChildren()
 #     blast_node.parm("grouptype").set(4)
 #
 # geo_node.layoutChildren()
+
