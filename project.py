@@ -341,9 +341,9 @@ class ProjectManager(QtWidgets.QWidget):
         # get all items in current node & subdirs
         for item in self.items:
             path = os.path.join(self.current_node.path, item)
-            if os.path.isdir(path):  # if item is directory
+            if os.path.isdir(path):  # if item is a directory
                 self.layout_usd_values(path, item)
-            else:  # if item is usd file
+            else:  # if item is a usd file
                 self.layout_usd_files(item)
 
     def layout_usd_values(self, path, item):
