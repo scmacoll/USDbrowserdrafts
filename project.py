@@ -35,9 +35,9 @@ class Tree:
             current = found
 
 
-class ProjectManager(QtWidgets.QWidget):
+class UsdBrowser(QtWidgets.QWidget):
     def __init__(self):
-        super(ProjectManager, self).__init__()
+        super(UsdBrowser, self).__init__()
         # Set data structures
         self.tree = Tree()
         self.current_node = self.tree.root
@@ -46,7 +46,7 @@ class ProjectManager(QtWidgets.QWidget):
         # Load QtDesigner UI file
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load('/Users/stu/Library/Preferences/houdini/19.5'
-                              '/scripts/python/projectview/projectview.ui')
+                              '/scripts/python/projectview/usdprojbrowser.ui')
 
         # get UI elements (QtDesigner)
         self.usd_logo = self.ui.findChild(QtWidgets.QLabel, 'usdlogo')
@@ -88,7 +88,7 @@ class ProjectManager(QtWidgets.QWidget):
         self.reset_btn.clicked.connect(self.reset_button)
 
         # set icons for UI elements
-        usd_logo_icon_path = '/Users/stu/Downloads/image2vector(4).svg'
+        usd_logo_icon_path = '/Users/stu/Library/Preferences/houdini/19.5/scripts/python/projectview/static/USDlogovector.svg'
         usd_logo_icon = QtGui.QPixmap(usd_logo_icon_path)
         self.usd_logo.setPixmap(usd_logo_icon)
         set_proj_icon_path = \
@@ -752,7 +752,7 @@ class ProjectManager(QtWidgets.QWidget):
             else:
                 self.scene_list.clearSelection()
         self.enter_pressed_on_search_bar = False
-        super(ProjectManager, self).mousePressEvent(event)
+        super(UsdBrowser, self).mousePressEvent(event)
 
     def keyPressEvent(self, event):
 
@@ -767,15 +767,15 @@ class ProjectManager(QtWidgets.QWidget):
             elif self.scene_list.hasFocus():
                 self.scene_list.clearSelection()
 
-            super(ProjectManager, self).keyPressEvent(event)
+            super(UsdBrowser, self).keyPressEvent(event)
 
         elif event.key() == QtCore.Qt.Key_Backspace:
             self.scene_list.clearSelection()
-            super(ProjectManager, self).keyPressEvent(event)
+            super(UsdBrowser, self).keyPressEvent(event)
 
         elif event.key() == QtCore.Qt.Key_Delete:
             self.scene_list.clearSelection()
-            super(ProjectManager, self).keyPressEvent(event)
+            super(UsdBrowser, self).keyPressEvent(event)
 
         elif event.key() == QtCore.Qt.Key_Return:
             if self.search_bar.hasFocus():
@@ -786,7 +786,7 @@ class ProjectManager(QtWidgets.QWidget):
             else:
                 self.double_click_forward()
                 self.enter_pressed_on_search_bar = False
-            super(ProjectManager, self).keyPressEvent(event)
+            super(UsdBrowser, self).keyPressEvent(event)
 
         # Forward and back directory with arrow keys
         elif event.key() == QtCore.Qt.Key_Left:
@@ -800,11 +800,11 @@ class ProjectManager(QtWidgets.QWidget):
         elif event.matches(QKeySequence("Ctrl+Backspace")) \
                 and self.search_bar.hasFocus():
             self.search_bar.clear()
-            super(ProjectManager, self).keyPressEvent(event)
+            super(UsdBrowser, self).keyPressEvent(event)
 
     def keyReleaseEvent(self, event):
         if event.key() not in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down,
                                QtCore.Qt.Key_Return):
             self.enter_pressed_on_search_bar = False
-        super(ProjectManager, self).keyReleaseEvent(event)
+        super(UsdBrowser, self).keyReleaseEvent(event)
 

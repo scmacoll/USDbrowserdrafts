@@ -14,3 +14,10 @@
 #
 # def onCreateInterface():
 #     return project.ProjectManager()
+
+# from projectview import project
+# import importlib
+# importlib.reload(project)
+#
+# def onCreateInterface():
+#     return project.Project
