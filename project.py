@@ -88,7 +88,7 @@ class UsdBrowser(QtWidgets.QWidget):
         self.reset_btn.clicked.connect(self.reset_button)
 
         # set icons for UI elements
-        usd_logo_icon_path = '/Users/stu/Library/Preferences/houdini/19.5/scripts/python/projectview/static/USDlogovector.svg'
+        usd_logo_icon_path = 'static/USDlogovector.svg'
         usd_logo_icon = QtGui.QPixmap(usd_logo_icon_path)
         self.usd_logo.setPixmap(usd_logo_icon)
         set_proj_icon_path = \
