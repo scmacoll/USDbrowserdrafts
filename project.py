@@ -807,3 +807,4 @@ class ProjectManager(QtWidgets.QWidget):
                                QtCore.Qt.Key_Return):
             self.enter_pressed_on_search_bar = False
         super(ProjectManager, self).keyReleaseEvent(event)
+
