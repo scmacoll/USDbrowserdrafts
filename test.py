@@ -10,8 +10,6 @@ class ProjectManager(QtWidgets.QWidget):
         self.proj = hou.getenv('JOB') + '/'
         self.visited_dirs = []
         self.current_index = -1
-        # print(str((self.proj.split('/')[6] + '/ = ' + (
-        #     str(self.current_index)))))
 
         # Load UI file
         loader = QtUiTools.QUiLoader()
